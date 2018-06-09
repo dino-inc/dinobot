@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import pickle
 
 class Emoji:
     def __init__(self, bot):
@@ -8,14 +9,19 @@ class Emoji:
         global boi
         global blobdance
         global dab
-        global boi2
+        global tagged
+        # global boi2
         self.bot = bot
         petpoc = False
         rbnr = 231614904035966984
+        tagdump = open("tagged.pickle", "rb")
+        tagged = pickle.load(tagdump)
+        tagdump.close()
+        # emojis
         blobdance = "a:blobdance:429457433707151361"
         boi = "a:boi:452994849319419915"
         dab = "a:vault_dab:452284889262325762"
-        boi2 = "a:boi:452995881046900748"
+        # boi2 = "a:boi:452995881046900748"
 
     def check_if_rbnr(ctx):
         return ctx.guild.id == rbnr
@@ -38,6 +44,35 @@ class Emoji:
         else:
             await ctx.send("Error. Could not start the petpocalypse. " + str(error))
 
+    @commands.command(name='settagged')
+    @commands.is_owner()
+    async def settagged(self, ctx, member: discord.Member):
+        global tagged
+        tagged = member.id
+        tagged_file_dump = open("tagged.pickle", "wb")
+        pickle.dump(tagged, tagged_file_dump)
+        tagged_file_dump.close()
+        await ctx.send("Tagged "+member.display_name+" with the rainbow.")
+
+    @commands.command(name='checktagged')
+    async def checktagged(self, ctx):
+        try:
+            member = discord.utils.get(ctx.guild.members, id=tagged)
+            await ctx.send("The currently tagged user is " + member.display_name + ".")
+        except:
+            await ctx.send("Sorry, the currently tagged person seems to have vanished.")
+
+
+    @commands.command()
+    async def tag(self, ctx, member: discord.Member):
+        global tagged
+        if ctx.author.id == tagged:
+            tagged = member.id
+            pickle.dump(tagged, open("tagged.pickle", "wb"))
+            await ctx.send("Tagged "+member.display_name+" with the rainbow.")
+        else:
+            member = discord.utils.get(ctx.guild.members, id=tagged)
+            await ctx.send("You are not "+member.display_name+".")
     async def on_message(self, message):
         global petpoc
         if petpoc == True and self.bot.get_guild(rbnr) == message.guild:
@@ -45,13 +80,11 @@ class Emoji:
             petchannel = discord.utils.get(message.guild.channels, name="shitposters_paradise")
             if petchannel == message.channel:
                 await message.add_reaction("a:animatedpet:393801987247964161")
-        if message.author.id == 187722231256711168:
+        if message.author.id == tagged:
             await check_boi(message, blobdance, "boi")
         else:
             await check_boi(message, boi, "boi")
         await check_boi(message, dab, "dab")
-
-
 
     async def on_raw_reaction_add(self, reaction, messageid, channelid, user):
         reactchannel = self.bot.get_channel(channelid)
@@ -68,6 +101,7 @@ class Emoji:
     #             print(emoji.id)
     #             print(emoji.name)
 
+
 async def check_boi(message, reaction, trigger):
     if trigger in message.content.lower():
         if " "+trigger+" " in message.content.lower():
@@ -78,6 +112,7 @@ async def check_boi(message, reaction, trigger):
             await message.add_reaction(reaction)
         elif len(message.content) == len(trigger):
             await message.add_reaction(reaction)
+
 
 def setup(bot):
     bot.add_cog(Emoji(bot))
