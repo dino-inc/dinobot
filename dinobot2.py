@@ -21,7 +21,8 @@ def check_if_rbnr(ctx):
     return ctx.guild.id == rbnr
 
 
-initial_extensions = ['cogs.stats', 'cogs.owner', 'cogs.selfroles', 'cogs.chatbot', 'cogs.fun', 'cogs.emoji']
+initial_extensions = ['cogs.stats', 'cogs.owner', 'cogs.selfroles', 'cogs.chatbot', 'cogs.fun', 'cogs.emoji',
+                      'cogs.adventure']
 
 
 if __name__ == '__main__':

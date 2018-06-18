@@ -6,22 +6,13 @@ class Emoji:
     def __init__(self, bot):
         global petpoc
         global rbnr
-        global boi
-        global blobdance
-        global dab
         global tagged
-        # global boi2
         self.bot = bot
         petpoc = False
         rbnr = 231614904035966984
         tagdump = open("tagged.pickle", "rb")
         tagged = pickle.load(tagdump)
         tagdump.close()
-        # emojis
-        blobdance = "a:blobdance:429457433707151361"
-        boi = "a:boi:452994849319419915"
-        dab = "a:vault_dab:452284889262325762"
-        # boi2 = "a:boi:452995881046900748"
 
     def check_if_rbnr(ctx):
         return ctx.guild.id == rbnr
@@ -81,10 +72,17 @@ class Emoji:
             if petchannel == message.channel:
                 await message.add_reaction("a:animatedpet:393801987247964161")
         if message.author.id == tagged:
+            blobdance = "a:blobdance:429457433707151361"
             await check_boi(message, blobdance, "boi")
         else:
+            boi = "a:boi:452994849319419915"
             await check_boi(message, boi, "boi")
+        heck = ":heck:257730871111450625"
+        await check_boi(message, heck, "heck")
+        await check_boi(message, heck, "hecking")
+        dab = "a:vault_dab:452284889262325762"
         await check_boi(message, dab, "dab")
+        await check_boi(message, dab, "dabbing")
 
     async def on_raw_reaction_add(self, reaction, messageid, channelid, user):
         reactchannel = self.bot.get_channel(channelid)
@@ -106,9 +104,9 @@ async def check_boi(message, reaction, trigger):
     if trigger in message.content.lower():
         if " "+trigger+" " in message.content.lower():
             await message.add_reaction(reaction)
-        elif message.content.startswith(trigger+" ") or message.content.startswith(trigger.upper()+" "):
+        elif message.content.lower().startswith(trigger+" ") or message.content.startswith(trigger.upper()+" "):
             await message.add_reaction(reaction)
-        elif message.content.endswith(" "+trigger) or message.content.endswith(" "+trigger.upper()):
+        elif message.content.lower().endswith(" "+trigger) or message.content.endswith(" "+trigger.upper()):
             await message.add_reaction(reaction)
         elif len(message.content) == len(trigger):
             await message.add_reaction(reaction)

@@ -3,6 +3,10 @@ from discord.ext import commands
 import random
 import unicodedata
 from sqlalchemy import *
+import requests
+from discord import Webhook, RequestsWebhookAdapter
+
+
 class Fun:
     def __init__(self, bot):
         global rbnr
@@ -80,7 +84,10 @@ class Fun:
         s = users.select()
         rs = s.execute()
 
-
+    # @commands.command(help="webhook test")
+    # async def webhooktest(self, ctx):
+    #     webhook = Webhook.partial(123456, 'abcdefg', adapter=RequestsWebhookAdapter())
+    #     webhook.send('Hello World', username='Foo')
 
 def setup(bot):
     bot.add_cog(Fun(bot))
