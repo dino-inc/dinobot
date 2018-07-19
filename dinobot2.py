@@ -49,6 +49,8 @@ async def on_ready():
     print()
     print("------------------------------")
 
+bot.guild_list_index = []
+
 
 
 @bot.event
@@ -92,8 +94,27 @@ async def on_member_remove(member):
     em.set_footer(text=time.strftime("%e %b %Y %H:%M:%S%p"))
     await botlogs.send(embed = em)
 
-
-
+@commands.check(check_if_rbnr)
+@bot.command()
+async def indexGuild(ctx):
+    guild_list_index = []
+    await ctx.send('Beginning indexing, this will take a long time.')
+    for channel in ctx.guild.text_channels:
+        try:
+            async with channel.typing():
+                tempHist = await channel.history(limit=None,reverse=True).flatten()
+                guild_list_index.append(tempHist)
+                print(f'Finished with {channel.name}.')
+        except:
+            print(f'Errored on {channel.name}.')
+    for channel_index in guild_list_index:
+        counter = 0
+        for message in channel_index:
+            counter = counter + 1
+            print(message.content)
+        print(counter)
+    bot.guild_list_index = guild_list_index
+    await ctx.send('Finished indexing the server.')
 
 # dino_bot
 token = open("token.txt", 'r')

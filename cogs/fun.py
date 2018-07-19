@@ -3,6 +3,7 @@ from discord.ext import commands
 import random
 import unicodedata
 from sqlalchemy import *
+import asyncio
 import requests
 from discord import Webhook, RequestsWebhookAdapter
 
@@ -83,6 +84,12 @@ class Fun:
 
         s = users.select()
         rs = s.execute()
+
+    @commands.command()
+    async def infinitetyping(self, ctx, channel : discord.TextChannel):
+        async with channel.typing():
+            await asyncio.sleep(120)
+            await ctx.send(f"Finished annoying people in {channel.name}.")
 
     # @commands.command(help="webhook test")
     # async def webhooktest(self, ctx):

@@ -2,17 +2,25 @@ import discord
 from discord.ext import commands
 import matplotlib.pyplot as plt
 from operator import itemgetter
+import pickle
+import json
+
 
 class StatCommands:
     def __init__(self, bot):
+        global rbnr
         global searching
         global owner
         self.bot = bot
         searching = False
         owner = 141695444995670017  # dino
+        rbnr = 231614904035966984  # regs but not regs
+        self.stat_index = []
+
+
 
     @commands.command()
-    async def search(self, ctx, channel, count : int, *, arg):
+    async def oldsearch(self, ctx, channel, count : int, *, arg):
         global searching
         if not searching:
             if ctx.author.id != owner:
@@ -84,7 +92,7 @@ class StatCommands:
         elif searching == True:
             await ctx.send("Currently searching, try again later.")
 
-    @search.error
+    @oldsearch.error
     async def search_error(self, ctx, error):
         global searching
         if isinstance(error, commands.errors.BadArgument):
@@ -135,6 +143,7 @@ class StatCommands:
         elif searching:
             await ctx.send("Currently searching, try again later.")
 
+
 async def addSpaces(string):
     if len(string) < 30:
         string += " "*(30-len(string))
@@ -145,6 +154,9 @@ async def gatherEmojiList(ctx):
     for emoji in ctx.guild.emojis:
         emojiList.append([emoji.name, 0])
     return emojiList
+
+def check_if_rbnr(ctx):
+    return ctx.guild.id == rbnr
 
 
 def setup(bot):
