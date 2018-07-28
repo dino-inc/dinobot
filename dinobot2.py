@@ -14,7 +14,7 @@ owner = 141695444995670017  # dino
 azelserver = 309168904310095886  # samsara - maybe woomy's?
 rbnr = 231614904035966984  # regs but not regs
 # global variables
-
+bot.guild_list_index = None
 
 
 def check_if_rbnr(ctx):
@@ -23,7 +23,6 @@ def check_if_rbnr(ctx):
 
 initial_extensions = ['cogs.stats', 'cogs.owner', 'cogs.selfroles', 'cogs.chatbot', 'cogs.fun', 'cogs.emoji',
                       'cogs.adventure']
-
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -49,7 +48,6 @@ async def on_ready():
     print()
     print("------------------------------")
 
-bot.guild_list_index = []
 
 
 
@@ -94,7 +92,6 @@ async def on_member_remove(member):
     em.set_footer(text=time.strftime("%e %b %Y %H:%M:%S%p"))
     await botlogs.send(embed = em)
 
-@commands.check(check_if_rbnr)
 @bot.command()
 async def indexGuild(ctx):
     guild_list_index = []
@@ -107,12 +104,6 @@ async def indexGuild(ctx):
                 print(f'Finished with {channel.name}.')
         except:
             print(f'Errored on {channel.name}.')
-    for channel_index in guild_list_index:
-        counter = 0
-        for message in channel_index:
-            counter = counter + 1
-            print(message.content)
-        print(counter)
     bot.guild_list_index = guild_list_index
     await ctx.send('Finished indexing the server.')
 
