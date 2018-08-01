@@ -19,17 +19,39 @@ class StatCommands:
 
     @commands.group(help="Comprehensive stats.")
     async def newsearch(self, ctx):
+        self.stat_index = self.bot.guild_list_index
         if self.stat_index is None:
-            
+            await ctx.send("Cannot generate stats; no index exists. Use !indexGuild to generate one.")
+            return
+
+    # @newsearch.error
+    # async def newsearch_error(self, ctx, error):
+    #     print("errored")
+    #     if isinstance(error, commands.errors.MissingRequiredArgument):
+    #         await ctx.send("Please enter a valid subcommand. (total or search)")
+    #     else:
+    #         await ctx.send(error)
+
+
     @newsearch.group()
     async def total(self, ctx):
-        await ctx.send("first")
+        pass
+
+    # @total.error
+    # async def newsearch_total_error(self, ctx, error):
+    #     if isinstance(error, commands.errors.MissingRequiredArgument):
+    #         await ctx.send("Please enter a valid subcommand. (user, channel, or server)")
+    #     else:
+    #         await ctx.send(error)
+
     @total.command()
     async def user(self, ctx, target : discord.Member):
-        await ctx.send("second")
+        await ctx.send(embed=await total_user_stats(ctx, target, self.stat_index))
+
     @total.command()
     async def channel(self, ctx, target : discord.TextChannel):
-        pass
+        await ctx.send(f"Searching for total channel stats on {target.name}.")
+
 
 # The command graveyard, for purposes of easy access. Will remove later.
     # @commands.command()
@@ -168,6 +190,33 @@ class StatCommands:
 #         emojiList.append([emoji.name, 0])
 #     return emojiList
 #
+
+async def total_user_stats(ctx, user, index):
+    async with ctx.channel.typing():
+        pending_search_message = await ctx.send(f"Searching for total user stats on {user.display_name}.")
+        message_count = 0
+        average_length_list = []
+        average_length_sum = 0
+        average_length = 1
+        for channel in index:
+            for message in channel:
+                if message.author == user:
+                    average_length_list.append(len(message.content))
+                    message_count += 1
+        for x in average_length_list:
+            average_length_sum += x
+        try:
+            average_length = average_length_sum/len(average_length_list)
+        except:
+            await ctx.send("ERROR; CANNOT DIVIDE BY ZERO; SOMETHING WENT WRONG.")
+    em = discord.Embed(title='User Stats', description=f"Message count:         {message_count}\n"
+                                                       f"Average (char) length: {round(average_length, 2)}", colour=0xFFD700)
+    em.set_author(name=user.display_name, icon_url=user.avatar_url)
+    em.set_footer(text='The data\'s probably accurate...')
+    await pending_search_message.delete()
+    return em
+
+
 def check_if_rbnr(ctx):
     return ctx.guild.id == rbnr
 
