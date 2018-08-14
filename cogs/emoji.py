@@ -83,7 +83,7 @@ class Emoji:
         dab = "a:vault_dab:452284889262325762"
         await check_boi(message, dab, "dab")
         await check_boi(message, dab, "dabbing")
-        fortnite = "a:epicfortnitedance:478777437203726337"
+        fortnite = "a:fortnitedance:478779951269675008"
         await check_boi(message, fortnite, "fortnite")
 
     async def on_raw_reaction_add(self, reaction, messageid, channelid, user):
@@ -97,7 +97,7 @@ class Emoji:
     # quick and dirty emoji id finder
     # async def on_ready(self):
     #     for emoji in self.bot.emojis:
-    #         if emoji.name == "boi2":
+    #         if emoji.name == "fortnitedance":
     #             print(emoji.id)
     #             print(emoji.name)
 
