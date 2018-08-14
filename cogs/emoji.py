@@ -83,6 +83,8 @@ class Emoji:
         dab = "a:vault_dab:452284889262325762"
         await check_boi(message, dab, "dab")
         await check_boi(message, dab, "dabbing")
+        fortnite = "a:epicfortnitedance:478777437203726337"
+        await check_boi(message, fortnite, "fortnite")
 
     async def on_raw_reaction_add(self, reaction, messageid, channelid, user):
         reactchannel = self.bot.get_channel(channelid)
