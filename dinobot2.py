@@ -71,9 +71,9 @@ async def on_message_delete(message):
     elif message.guild == bot.get_guild(rbnr):
         botlog = message.guild.get_channel(345003652521525258)
         await log_message(message, botlog)
-    elif message.guild == bot.get_guild(vault_city):
-        botlog = message.guild.get_channel(477970043855044623)
-        await log_message(message, botlog)
+    # elif message.guild == bot.get_guild(vault_city):
+    #     botlog = message.guild.get_channel(477970043855044623)
+    #     await log_message(message, botlog)
 
 
 

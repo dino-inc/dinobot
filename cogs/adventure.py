@@ -18,13 +18,13 @@ class Adventure:
         else:
             await ctx.send('A fight is already in progress.')
 
-    @commands.command(help = "Ends a fight.")
-    async def surrender(self, ctx):
-        if self.fightState == True:
-            self.fightState = False
-            await ctx.send('Ended the fight.')
-        else:
-            await ctx.send('There is no fight to end.')
+    # @commands.command(help = "Ends a fight.")
+    # async def surrender(self, ctx):
+    #     if self.fightState == True:
+    #         self.fightState = False
+    #         await ctx.send('Ended the fight.')
+    #     else:
+    #         await ctx.send('There is no fight to end.')
 
     @commands.command(help="test of interactive buttons")
     async def buttontest(self, ctx):
