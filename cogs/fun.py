@@ -98,7 +98,7 @@ class Fun:
     @commands.command()
     async def infinitetyping(self, ctx, channel : discord.TextChannel):
         async with channel.typing():
-            await asyncio.sleep(120)
+            await asyncio.sleep(100000)
             await ctx.send(f"Finished annoying people in {channel.name}.")
 
     @commands.command()
