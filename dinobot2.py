@@ -23,8 +23,10 @@ def check_if_rbnr(ctx):
     return ctx.guild.id == rbnr
 
 
+
 initial_extensions = ['cogs.stats', 'cogs.owner', 'cogs.selfroles', 'cogs.chatbot', 'cogs.fun', 'cogs.emoji',
                       'cogs.adventure']
+
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -122,5 +124,6 @@ async def log_message(message, botlog):
 
 # dino_bot
 token = open("token.txt", 'r')
-token.strip()
-bot.run(token.read(), bot=True, reconnect=True)
+token = token.read().strip()
+bot.run(token, bot=True, reconnect=True)
+
