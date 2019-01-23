@@ -25,7 +25,7 @@ def check_if_rbnr(ctx):
 
 
 initial_extensions = ['cogs.stats', 'cogs.owner', 'cogs.selfroles', 'cogs.chatbot', 'cogs.fun', 'cogs.emoji',
-                      'cogs.adventure']
+                      'cogs.adventure', 'cogs.image']
 
 
 if __name__ == '__main__':
