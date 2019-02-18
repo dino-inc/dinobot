@@ -15,6 +15,8 @@ azelserver = 309168904310095886  # samsara - maybe woomy's?
 rbnr = 231614904035966984  # regs but not regs
 ushankanation = 418591546389168129 # ushanka's channel
 vault_city = 477880018232672266 #ushanka's server
+plat_server = 546795872373964829 #platinumbass's server
+platinumbass = bot.get_guild(plat_server).get_member(292585739642732544)
 # global variables
 bot.guild_list_index = None
 
@@ -59,6 +61,7 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     # EXTREMELY IMPORTANT DO NOT REMOVE, PROCESSES COMMANDS AFTER CHECKING MESSAGE
+    await scan_message(message)
     await bot.process_commands(message)
 
 # leaving logging as main code because... might as well
@@ -121,6 +124,39 @@ async def log_message(message, botlog):
         pass
     # sending actual embed
     await botlog.send(embed=em)
+
+async def scan_message(message):
+    if message.guild.id == plat_server:
+        plat_nsfw_id = 546795917945339934
+        if ".image" not in message.content:
+            return
+        banned_words = open("bad.txt", "r").read().split("\n")
+        stripped = message.content.replace('.image', '')
+        stripped = stripped.lower()
+        stripped = stripped.split()
+        for word in stripped:
+            print("testing "+word)
+            print(banned_words)
+            if word in banned_words:
+                plat_nsfw = message.guild.get_channel(plat_nsfw_id)
+                # embed message itself
+                em = discord.Embed(description=message.content,
+                                   colour=0xFF0000, timestamp=message.created_at)
+                em.set_author(name='Naughty post by: ' + message.author.display_name,
+                              icon_url='http://rottenrat.com/wp-content/uploads/2011/01/Marty-Rathbun-anti-sign.jpg')
+                em.set_thumbnail(url=message.author.avatar_url)
+                em.set_footer(text=f"Posted in #{message.channel.name}")
+                # embed url images
+                try:
+                    attach = message.attachments
+                    em.set_image(url=attach[0].url)
+                except:
+                    pass
+                await message.channel.send("SASUUUUUUUUUUUKE!")
+                await message.delete()
+                await plat_nsfw.send(embed=em)
+                await platinumbass.send(embed=em)
+                return
 
 # dino_bot
 token = open("token.txt", 'r')
