@@ -2,6 +2,7 @@ import discord
 import time
 import sys, traceback
 from discord.ext import commands
+import random
 
 
 
@@ -16,7 +17,6 @@ rbnr = 231614904035966984  # regs but not regs
 ushankanation = 418591546389168129 # ushanka's channel
 vault_city = 477880018232672266 #ushanka's server
 plat_server = 546795872373964829 #platinumbass's server
-platinumbass = bot.get_guild(plat_server).get_member(292585739642732544)
 # global variables
 bot.guild_list_index = None
 
@@ -53,7 +53,9 @@ async def on_ready():
         print(str('{0}, ').format(guild), end='')
     print()
     print("------------------------------")
+    global plat_bass
     bot.rbnr = rbnr
+    plat_bass = bot.get_guild(plat_server).get_member(292585739642732544)
 
 
 
@@ -126,17 +128,18 @@ async def log_message(message, botlog):
     await botlog.send(embed=em)
 
 async def scan_message(message):
+    if message.guild == None:
+        return
     if message.guild.id == plat_server:
         plat_nsfw_id = 546795917945339934
         if ".image" not in message.content:
             return
         banned_words = open("bad.txt", "r").read().split("\n")
+        responses = open("responses.txt", "r").read().split("\n")
         stripped = message.content.replace('.image', '')
         stripped = stripped.lower()
         stripped = stripped.split()
         for word in stripped:
-            print("testing "+word)
-            print(banned_words)
             if word in banned_words:
                 plat_nsfw = message.guild.get_channel(plat_nsfw_id)
                 # embed message itself
@@ -152,10 +155,10 @@ async def scan_message(message):
                     em.set_image(url=attach[0].url)
                 except:
                     pass
-                await message.channel.send("SASUUUUUUUUUUUKE!")
+                await message.channel.send(random.choice(responses))
                 await message.delete()
                 await plat_nsfw.send(embed=em)
-                await platinumbass.send(embed=em)
+                await plat_bass.send(embed=em)
                 return
 
 # dino_bot
