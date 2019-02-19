@@ -16,7 +16,7 @@ azelserver = 309168904310095886  # samsara - maybe woomy's?
 rbnr = 231614904035966984  # regs but not regs
 ushankanation = 418591546389168129 # ushanka's channel
 vault_city = 477880018232672266 #ushanka's server
-plat_server = 546795872373964829 #platinumbass's server
+plat_server = 292586384957636608 #platinumbass's server
 # global variables
 bot.guild_list_index = None
 
@@ -132,7 +132,7 @@ async def scan_message(message):
     if message.guild == None:
         return
     if message.guild.id == plat_server:
-        plat_nsfw_id = 546795917945339934
+        plat_nsfw_id = 547267129326698497
         if message.author.id == 439205512425504771 and delete_notsobot == True:
             await message.delete()
             delete_notsobot = False
