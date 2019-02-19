@@ -128,10 +128,15 @@ async def log_message(message, botlog):
     await botlog.send(embed=em)
 
 async def scan_message(message):
+    global delete_notsobot
     if message.guild == None:
         return
     if message.guild.id == plat_server:
         plat_nsfw_id = 546795917945339934
+        if message.author.id == 439205512425504771 and delete_notsobot == True:
+            await message.delete()
+            delete_notsobot = False
+            return
         if ".image" not in message.content:
             return
         banned_words = open("bad.txt", "r").read().split("\n")
@@ -159,7 +164,9 @@ async def scan_message(message):
                 await message.delete()
                 await plat_nsfw.send(embed=em)
                 await plat_bass.send(embed=em)
+                delete_notsobot = True
                 return
+
 
 # dino_bot
 token = open("token.txt", 'r')

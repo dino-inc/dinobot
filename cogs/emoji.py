@@ -86,13 +86,17 @@ class Emoji:
         fortnite = "a:fortnitedance:478779951269675008"
         await check_boi(message, fortnite, "fortnite")
 
-    async def on_raw_reaction_add(self, reaction, messageid, channelid, user):
-        reactchannel = self.bot.get_channel(channelid)
-        message = await reactchannel.get_message(messageid)
-        if reaction.id == 349032980821311488:
-            await message.add_reaction("a:animatedpet:393801987247964161")
-        elif reaction.id == 251069497241370624:
-            await message.add_reaction("a:owowhatsthis:422870186622844937")
+    async def on_raw_reaction_add(self, payload):
+        try:
+            messageid = payload.message_id
+            channelid = payload.channel_id
+            reactchannel = self.bot.get_channel(channelid)
+            message = await reactchannel.get_message(messageid)
+            if payload.emoji.id == 349032980821311488:
+                await message.add_reaction("a:animatedpet:393801987247964161")
+            elif payload.emoji.id == 251069497241370624:
+                await message.add_reaction("a:owowhatsthis:422870186622844937")
+        except: pass
 
     # quick and dirty emoji id finder
     # async def on_ready(self):
