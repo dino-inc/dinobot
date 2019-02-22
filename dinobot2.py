@@ -16,7 +16,6 @@ azelserver = 309168904310095886  # samsara - maybe woomy's?
 rbnr = 231614904035966984  # regs but not regs
 ushankanation = 418591546389168129 # ushanka's channel
 vault_city = 477880018232672266 #ushanka's server
-plat_server = 292586384957636608 #platinumbass's server
 # global variables
 bot.guild_list_index = None
 
@@ -127,45 +126,6 @@ async def log_message(message, botlog):
     # sending actual embed
     await botlog.send(embed=em)
 
-async def scan_message(message):
-    global delete_notsobot
-    if message.guild == None:
-        return
-    if message.guild.id == plat_server:
-        plat_nsfw_id = 547267129326698497
-        if message.author.id == 439205512425504771 and delete_notsobot == True:
-            await message.delete()
-            delete_notsobot = False
-            return
-        if ".image" not in message.content:
-            return
-        banned_words = open("bad.txt", "r").read().split("\n")
-        responses = open("responses.txt", "r").read().split("\n")
-        stripped = message.content.replace('.image', '')
-        stripped = stripped.lower()
-        stripped = stripped.split()
-        for word in stripped:
-            if word in banned_words:
-                plat_nsfw = message.guild.get_channel(plat_nsfw_id)
-                # embed message itself
-                em = discord.Embed(description=message.content,
-                                   colour=0xFF0000, timestamp=message.created_at)
-                em.set_author(name='Naughty post by: ' + message.author.display_name,
-                              icon_url='http://rottenrat.com/wp-content/uploads/2011/01/Marty-Rathbun-anti-sign.jpg')
-                em.set_thumbnail(url=message.author.avatar_url)
-                em.set_footer(text=f"Posted in #{message.channel.name}")
-                # embed url images
-                try:
-                    attach = message.attachments
-                    em.set_image(url=attach[0].url)
-                except:
-                    pass
-                await message.channel.send(random.choice(responses))
-                await message.delete()
-                await plat_nsfw.send(embed=em)
-                await plat_bass.send(embed=em)
-                delete_notsobot = True
-                return
 
 
 # dino_bot
