@@ -2,15 +2,15 @@ import discord
 from discord.ext import commands
 import random
 import unicodedata
-from sqlalchemy import *
+# from sqlalchemy import *
 import asyncio
-import requests
+# import requests
 import aiohttp
 from discord import Webhook, AsyncWebhookAdapter
 import os
 
 
-class Fun:
+class Fun(commands.Cog):
     def __init__(self, bot):
         global rbnr
         global pending_game
@@ -41,16 +41,20 @@ class Fun:
         if isinstance(error, commands.errors.CommandOnCooldown):
             await ctx.send(
                 "Please wait {0} seconds before using this command again.".format(format(error.retry_after, '.2f')))
+            print(f"Forced a cooldown on {ctx.author.display_name}")
         else:
             await ctx.send("Error. Could not change status.")
+            print(f"Status could not be changed at the request of {ctx.author.display_name}")
 
     @commands.command(help = "Fun with RNG.")
     async def luckynumber(self, ctx):
         random.seed(a=ctx.author.id)
         await ctx.send('Your lucky number is ' + str(int(round(random.random()*100, 0))) +".")
+        print(f"Gave a lucky number to {ctx.author.display_name}")
 
     @commands.command(help = "Rating system.")
     async def rate(self, ctx):
+        print(f"Rated {ctx.author.display_name}")
         if ctx.message.content == "!rate dino":
             await ctx.send('I give that a 101/100!!!')
             return
@@ -70,43 +74,46 @@ class Fun:
             await ctx.send('I give that a ' + str(rating) + "/100.")
         else:
             await ctx.send('I give that a ' + str(rating) + "/100!")
-    @commands.command(help="Creates the database.")
-    async def databasecreate(self, ctx):
-        db = create_engine('sqlite:///wordlists.db')
 
-        db.echo = False  # Try changing this to True and see what happens
-
-        metadata = BoundMetaData(db)
-
-        users = Table('users', metadata,
-                      Column('weapon_action', String, primary_key=True),
-                      Column('weapon_type', String(40)),
-                      Column('age', Integer),
-                      Column('password', String),
-                      )
-        users.create()
-
-        i = users.insert()
-        i.execute(name='Mary', age=30, password='secret')
-        i.execute({'name': 'John', 'age': 42},
-                  {'name': 'Susan', 'age': 57},
-                  {'name': 'Carl', 'age': 33})
-
-        s = users.select()
-        rs = s.execute()
+    # @commands.command(help="Creates the database.")
+    # async def databasecreate(self, ctx):
+    #     db = create_engine('sqlite:///wordlists.db')
+    #
+    #     db.echo = False  # Try changing this to True and see what happens
+    #
+    #     metadata = BoundMetaData(db)
+    #
+    #     users = Table('users', metadata,
+    #                   Column('weapon_action', String, primary_key=True),
+    #                   Column('weapon_type', String(40)),
+    #                   Column('age', Integer),
+    #                   Column('password', String),
+    #                   )
+    #     users.create()
+    #
+    #     i = users.insert()
+    #     i.execute(name='Mary', age=30, password='secret')
+    #     i.execute({'name': 'John', 'age': 42},
+    #               {'name': 'Susan', 'age': 57},
+    #               {'name': 'Carl', 'age': 33})
+    #
+    #     s = users.select()
+    #     rs = s.execute()
 
     @commands.command()
     async def infinitetyping(self, ctx, channel : discord.TextChannel):
+        print("Excessively long typing begins.")
         async with channel.typing():
             await asyncio.sleep(100000)
             await ctx.send(f"Finished annoying people in {channel.name}.")
+            print("Finished long typing.")
 
-    @commands.command()
-    async def randomquote(self, ctx):
-        this_dir = os.path.dirname(__file__)
-        this_dir.replace('/cogs', '')
-        quote = random.choice(open('quotes.txt').readlines())
-        await ctx.send(quote)
+    # @commands.command()
+    # async def randomquote(self, ctx):
+    #     this_dir = os.path.dirname(__file__)
+    #     this_dir.replace('/cogs', '')
+    #     quote = random.choice(open('quotes.txt').readlines())
+    #     await ctx.send(quote)
 
     @commands.command()
     async def fencewars(self, ctx, member : discord.Member):
@@ -116,6 +123,7 @@ class Fun:
         if pending_game or ongoing_game:
             await ctx.send ("There's a game going on right now, please wait for it to finish.")
             return
+        print("Started a needlessly complex game.")
         await ctx.send(f"<@{ctx.author.id}> has challenged <@{member.id}> to a fence war! Type !accept to accept"
                        f" or !surrender to give up.")
         original_member = ctx.author

@@ -16,7 +16,7 @@ azelserver = 309168904310095886  # samsara - maybe woomy's?
 rbnr = 231614904035966984  # regs but not regs
 ushankanation = 418591546389168129 # ushanka's channel
 vault_city = 477880018232672266 #ushanka's server
-plat_server = 292586384957636608 #platinumbass's server
+#plat_server = 292586384957636608 #platinumbass's server
 # global variables
 bot.guild_list_index = None
 
@@ -26,9 +26,8 @@ def check_if_rbnr(ctx):
 
 
 
-initial_extensions = ['cogs.stats', 'cogs.owner', 'cogs.selfroles', 'cogs.chatbot', 'cogs.fun', 'cogs.emoji',
-                      'cogs.adventure', 'cogs.image']
-
+initial_extensions = ['cogs.fun', 'cogs.selfroles', 'cogs.owner', 'cogs.emoji']
+#unloaded cogs: adventure, image, stats, chatbot
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -55,7 +54,7 @@ async def on_ready():
     print("------------------------------")
     global plat_bass
     bot.rbnr = rbnr
-    plat_bass = bot.get_guild(plat_server).get_member(292585739642732544)
+    # plat_bass = bot.get_guild(plat_server).get_member(292585739642732544)
 
 
 
@@ -63,7 +62,7 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     # EXTREMELY IMPORTANT DO NOT REMOVE, PROCESSES COMMANDS AFTER CHECKING MESSAGE
-    await scan_message(message)
+    #await scan_message(message)
     await bot.process_commands(message)
 
 # leaving logging as main code because... might as well
@@ -74,10 +73,12 @@ async def on_message_delete(message):
     if message.channel == bot.get_channel(ushankanation):
             botlog = message.guild.get_channel(475865143520133140)
             await log_message(message, botlog)
+            print("Logged message in Ushanka's server.")
             return
     elif message.guild == bot.get_guild(rbnr):
         botlog = message.guild.get_channel(345003652521525258)
         await log_message(message, botlog)
+        print("Logged message in RBNR.")
     # elif message.guild == bot.get_guild(vault_city):
     #     botlog = message.guild.get_channel(477970043855044623)
     #     await log_message(message, botlog)
@@ -93,21 +94,22 @@ async def on_member_remove(member):
     em.set_author(name=member, icon_url=member.avatar_url)
     em.set_footer(text=time.strftime("%e %b %Y %H:%M:%S%p"))
     await botlogs.send(embed = em)
+    print("Logged member who left.")
 
-@bot.command()
-async def indexGuild(ctx):
-    guild_list_index = []
-    await ctx.send('Beginning indexing, this will take a long time.')
-    for channel in ctx.guild.text_channels:
-        try:
-            async with channel.typing():
-                tempHist = await channel.history(limit=None,reverse=True).flatten()
-                guild_list_index.append(tempHist)
-                print(f'Finished with {channel.name}.')
-        except:
-            print(f'Errored on {channel.name}.')
-    bot.guild_list_index = guild_list_index
-    await ctx.send('Finished indexing the server.')
+# @bot.command()
+# async def indexGuild(ctx):
+#     guild_list_index = []
+#     await ctx.send('Beginning indexing, this will take a long time.')
+#     for channel in ctx.guild.text_channels:
+#         try:
+#             async with channel.typing():
+#                 tempHist = await channel.history(limit=None,reverse=True).flatten()
+#                 guild_list_index.append(tempHist)
+#                 print(f'Finished with {channel.name}.')
+#         except:
+#             print(f'Errored on {channel.name}.')
+#     bot.guild_list_index = guild_list_index
+#     await ctx.send('Finished indexing the server.')
 
 async def log_message(message, botlog):
     em = discord.Embed(title='Deleted post in #{}'.format(message.channel), description=message.content,
@@ -126,7 +128,7 @@ async def log_message(message, botlog):
         pass
     # sending actual embed
     await botlog.send(embed=em)
-
+'''
 async def scan_message(message):
     global delete_notsobot
     if message.guild == None:
@@ -166,7 +168,7 @@ async def scan_message(message):
                 await plat_bass.send(embed=em)
                 delete_notsobot = True
                 return
-
+'''
 
 # dino_bot
 token = open("token.txt", 'r')

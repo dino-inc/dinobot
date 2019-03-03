@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import pickle
 
-class Emoji:
+class Emoji(commands.Cog):
     def __init__(self, bot):
         global petpoc
         global rbnr
@@ -24,16 +24,20 @@ class Emoji:
         if self.bot.get_guild(rbnr) == ctx.guild and petpoc == False:
             await ctx.send("**PETPOCALYPSE ARISEN**")
             petpoc = True
+            print(f"{ctx.author.display_name} toggled the petpocalypse on")
         elif self.bot.get_guild(rbnr) == ctx.guild and petpoc == True:
             await ctx.send("*Petpocalypse powering down...*")
             petpoc = False
+            print(f"{ctx.author.display_name} toggled the petpocalypse off")
 
     @petpoc.error
     async def petpoc_error(self, ctx, error):
         if isinstance(error, commands.errors.CheckFailure):
             await ctx.send("This is not RBNR.")
+            print(f"{ctx.author.display_name} tried to toggle the petpocalypse somewhere that wasn't rbnr")
         else:
             await ctx.send("Error. Could not start the petpocalypse. " + str(error))
+            print(f"{ctx.author.display_name} toggled the petpocalypse and it failed")
 
     @commands.command(name='settagged')
     @commands.is_owner()
@@ -44,6 +48,7 @@ class Emoji:
         pickle.dump(tagged, tagged_file_dump)
         tagged_file_dump.close()
         await ctx.send("Tagged "+member.display_name+" with the rainbow.")
+        print(f"Set tagged person to {member.display_name}")
 
     @commands.command(name='checktagged')
     async def checktagged(self, ctx):
@@ -64,6 +69,8 @@ class Emoji:
         else:
             member = discord.utils.get(ctx.guild.members, id=tagged)
             await ctx.send("You are not "+member.display_name+".")
+
+    @commands.Cog.listener()
     async def on_message(self, message):
         global petpoc
         if petpoc == True and self.bot.get_guild(rbnr) == message.guild:
@@ -86,6 +93,8 @@ class Emoji:
         fortnite = "a:fortnitedance:478779951269675008"
         await check_boi(message, fortnite, "fortnite")
 
+
+    @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         try:
             messageid = payload.message_id
@@ -94,8 +103,10 @@ class Emoji:
             message = await reactchannel.get_message(messageid)
             if payload.emoji.id == 349032980821311488:
                 await message.add_reaction("a:animatedpet:393801987247964161")
+                print("Added animated pet.")
             elif payload.emoji.id == 251069497241370624:
                 await message.add_reaction("a:owowhatsthis:422870186622844937")
+                print("Added animated OwO.")
         except: pass
 
     # quick and dirty emoji id finder
@@ -110,13 +121,19 @@ async def check_boi(message, reaction, trigger):
     if trigger in message.content.lower():
         if " "+trigger+" " in message.content.lower():
             await message.add_reaction(reaction)
+            await log_reaction_event(trigger)
         elif message.content.lower().startswith(trigger+" ") or message.content.startswith(trigger.upper()+" "):
             await message.add_reaction(reaction)
+            await log_reaction_event(trigger)
         elif message.content.lower().endswith(" "+trigger) or message.content.endswith(" "+trigger.upper()):
             await message.add_reaction(reaction)
+            await log_reaction_event(trigger)
         elif len(message.content) == len(trigger):
             await message.add_reaction(reaction)
+            await log_reaction_event(trigger)
 
+async def log_reaction_event(trigger):
+    print(f"Added {trigger} reaction.")
 
 def setup(bot):
     bot.add_cog(Emoji(bot))
