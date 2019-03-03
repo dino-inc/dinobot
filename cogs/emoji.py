@@ -4,12 +4,14 @@ import pickle
 
 class Emoji(commands.Cog):
     def __init__(self, bot):
+        global emoji_channel_id
         global petpoc
         global rbnr
         global tagged
         self.bot = bot
         petpoc = False
         rbnr = 231614904035966984
+        emoji_channel_id = 264206516238811136
         tagdump = open("tagged.pickle", "rb")
         tagged = pickle.load(tagdump)
         tagdump.close()
@@ -69,6 +71,22 @@ class Emoji(commands.Cog):
         else:
             member = discord.utils.get(ctx.guild.members, id=tagged)
             await ctx.send("You are not "+member.display_name+".")
+
+    @commands.command()
+    @commands.check(check_if_rbnr)
+    @commands.is_owner()
+    async def emoji_vote(self, ctx, url):
+        if ctx.channel.id == emoji_channel_id:
+            em = discord.Embed(description="An emoji vote has begun! Press ✅ to vote yes and "
+                                           f"❎ to vote no. \n You have 24 hours to vote.",
+                               colour=0xFF0000, timestamp=ctx.message.created_at)
+            # em.set_author(name=null,
+            #               icon_url=null,
+            #               url=null)
+            em.set_thumbnail(url=url)
+            vote_emoji_message = await ctx.send(embed=em)
+            await vote_emoji_message.add_reaction("✅")
+            await vote_emoji_message.add_reaction("❎")
 
     @commands.Cog.listener()
     async def on_message(self, message):
