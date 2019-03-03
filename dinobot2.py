@@ -17,6 +17,7 @@ rbnr = 231614904035966984  # regs but not regs
 ushankanation = 418591546389168129 # ushanka's channel
 vault_city = 477880018232672266 #ushanka's server
 #plat_server = 292586384957636608 #platinumbass's server
+
 # global variables
 bot.guild_list_index = None
 
