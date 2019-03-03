@@ -11,7 +11,7 @@ class Emoji(commands.Cog):
         self.bot = bot
         petpoc = False
         rbnr = 231614904035966984
-        emoji_channel_id = 264206516238811136
+        emoji_channel_id = 327338669423722507
         tagdump = open("tagged.pickle", "rb")
         tagged = pickle.load(tagdump)
         tagdump.close()
