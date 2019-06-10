@@ -2,3 +2,4 @@ token.txt
 graph.png
 cogs/__pycache__/
 virtualenv/
+.vscode/
