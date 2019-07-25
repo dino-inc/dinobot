@@ -13,7 +13,7 @@ class SelfRoles(commands.Cog):
         selfrolelist = ['Perverts', 'Dragons and Dungeons', 'Politician', 'TF Mercs', 'Overwatch Agent', 'Heisters',
                         "Garry's Mothers", 'Miners', 'Killer of Floors', 'Counter Strike', 'Super Smash Bro',
                         'Town of Salem', 'Team Rainbow', 'Tenno Skoom', 'Inklings', 'Paladins', 'Four Honour', 'Lethal League',
-                       'Apex Predator', 'Cloudy With A Chance Of Rain Too']
+                        'Apex Predator', 'Cloudy With A Chance Of Rain Too', 'League of Tilt']
 
     def check_if_rbnr(ctx):
         return ctx.guild.id == rbnr
