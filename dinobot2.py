@@ -11,7 +11,7 @@ import random
 bot = commands.Bot(command_prefix='!')
 
 # good variables
-owner = 141695444995670017  # dino
+owner = 228667580330672128  # straw
 azelserver = 309168904310095886  # samsara - maybe woomy's?
 rbnr = 231614904035966984  # regs but not regs
 ushankanation = 418591546389168129 # ushanka's channel
