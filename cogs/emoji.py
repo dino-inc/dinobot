@@ -73,7 +73,6 @@ class Emoji(commands.Cog):
             await ctx.send("You are not "+member.display_name+".")
 
     @commands.command()
-    @commands.check(check_if_rbnr)
     @commands.is_owner()
     async def emoji_vote(self, ctx, url):
         if ctx.channel.id == emoji_channel_id:
