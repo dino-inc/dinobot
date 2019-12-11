@@ -109,6 +109,10 @@ class Emoji(commands.Cog):
         await check_boi(message, dab, "dabbing")
         fortnite = "a:fortnitedance:478779951269675008"
         await check_boi(message, fortnite, "fortnite")
+        augh = "a:augh:654202633174777876"
+        await check_boi(message, augh, "augh")
+        dudewtf = ":dudewtf:650772731742126120"
+        await check_boi(message, dudewtf, "smegma")
 
 
     @commands.Cog.listener()
