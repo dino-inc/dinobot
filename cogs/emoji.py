@@ -113,6 +113,11 @@ class Emoji(commands.Cog):
         await check_boi(message, augh, "augh")
         dudewtf = ":dudewtf:650772731742126120"
         await check_boi(message, dudewtf, "smegma")
+        if message.guild.id == 309168904310095886:
+            sus = ":sus:812872447127846952"
+            await check_boi(message, sus, "sus")
+            amogus = ":amogus:812872447090098197"
+            await check_boi(message, amogus, "amogus")
 
 
     @commands.Cog.listener()
