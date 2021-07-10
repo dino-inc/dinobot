@@ -101,7 +101,7 @@ class Emoji(commands.Cog):
         else:
             boi = "a:boi:452994849319419915"
             await check_boi(message, boi, "boi")
-        heck = ":heck:257730871111450625"
+        heck = ":heck:830595955417284648"
         await check_boi(message, heck, "heck")
         await check_boi(message, heck, "hecking")
         dab = "a:vault_dab:452284889262325762"
