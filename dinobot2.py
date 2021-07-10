@@ -27,8 +27,8 @@ def check_if_rbnr(ctx):
 
 
 
-initial_extensions = ['cogs.fun', 'cogs.selfroles', 'cogs.owner', 'cogs.emoji']
-#unloaded cogs: adventure, image, stats, chatbot
+initial_extensions = ['cogs.fun', 'cogs.blessings', 'cogs.emoji']
+#unloaded cogs: adventure, image, stats, chatbot, owner, selfroles
 
 if __name__ == '__main__':
     for extension in initial_extensions:
