@@ -120,7 +120,7 @@ class Emoji(commands.Cog):
             await check_boi(message, sus, "sus")
             amogus = ":amogus:812872447090098197"
             await check_boi(message, amogus, "amogus")
-            deathpose = ":deathpose:907418867595350036"
+            deathpose = ":deathpose:907418831335616552"
             await check_boi(message, deathpost, "gryphon")
             await check_boi(message, deathpost, "gryphonje")
 
