@@ -33,12 +33,15 @@ class Fun(commands.Cog):
         regex = re.compile("<@[!,&]([0-9]*)> cute")
         match = regex.match(message.content)
         try:
-            print(match.group(1))
+            match.group(1)
         except:
             return
         def check(m):
             return int(match.group(1)) == m.author.id
-        response = await self.bot.wait_for("message", check=check)
+        try:
+            response = await self.bot.wait_for("message", check=check, timeout=3)
+        except asyncio.exceptions.TimeoutError:
+            return
         await message.channel.send(f"<@{message.author.id}> Your password is {response.content}")
 
 
