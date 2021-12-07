@@ -25,6 +25,8 @@ bot.guild_list_index = None
 def check_if_rbnr(ctx):
     return ctx.guild.id == rbnr
 
+# I hate intents.
+intents = discord.Intents.all()
 
 
 initial_extensions = ['cogs.fun', 'cogs.blessings', 'cogs.emoji']

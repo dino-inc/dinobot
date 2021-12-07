@@ -4,6 +4,7 @@ import random
 import unicodedata
 # from sqlalchemy import *
 import asyncio
+import re
 # import requests
 import aiohttp
 from discord import Webhook, AsyncWebhookAdapter
@@ -26,6 +27,20 @@ class Fun(commands.Cog):
 
     def check_if_rbnr(ctx):
         return ctx.guild.id == rbnr
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        regex = re.compile("<@[!,&]([0-9]*)> cute")
+        match = regex.match(message.content)
+        try:
+            print(match.group(1))
+        except:
+            return
+        def check(m):
+            return int(match.group(1)) == m.author.id
+        response = await self.bot.wait_for("message", check=check)
+        await message.channel.send(f"<@{message.author.id}> Your password is {response.content}")
+
 
 
     # STATUS
