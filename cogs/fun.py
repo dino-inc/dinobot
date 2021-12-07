@@ -30,7 +30,7 @@ class Fun(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        regex = re.compile("<@[!,&]([0-9]*)> cute")
+        regex = re.compile("<@[!,&]([0-9]*)> (?i)cute")
         match = regex.match(message.content)
         try:
             match.group(1)
