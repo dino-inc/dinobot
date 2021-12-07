@@ -39,7 +39,7 @@ class Fun(commands.Cog):
         def check(m):
             return int(match.group(1)) == m.author.id
         try:
-            response = await self.bot.wait_for("message", check=check, timeout=3)
+            response = await self.bot.wait_for("message", check=check, timeout=300)
         except asyncio.exceptions.TimeoutError:
             return
         await message.channel.send(f"<@{message.author.id}> Your password is {response.content}")
