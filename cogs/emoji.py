@@ -116,6 +116,8 @@ class Emoji(commands.Cog):
         moe = ":moe:875565586023874601"
         await check_boi(message, moe, "moe")
         if message.guild.id == 309168904310095886:
+            oomfiebateman = ":oomfiebateman:957041584480849980"
+            await check_boi(message, oomfiebateman, "oomfie")
             sus = ":sus:812872447127846952"
             await check_boi(message, sus, "sus")
             amogus = ":amogus:812872447090098197"
