@@ -7,8 +7,8 @@ from discord.ext import commands
 
 bot = commands.Bot(command_prefix='!')
 
-# good variables
-azelserver = 309168904310095886  # samsara
+# Samsara ID
+azelserver = 309168904310095886
 
 # I hate intents.
 intents = discord.Intents.all()

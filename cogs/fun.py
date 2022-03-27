@@ -13,20 +13,16 @@ import os
 
 class Fun(commands.Cog):
     def __init__(self, bot):
-        global rbnr
         global pending_game
         global ongoing_game
         global original_member
         global second_member
         self.bot = bot
-        rbnr = 231614904035966984
         pending_game = False
         ongoing_game = False
         original_member = None
         second_member = None
 
-    def check_if_rbnr(ctx):
-        return ctx.guild.id == rbnr
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -93,30 +89,6 @@ class Fun(commands.Cog):
         else:
             await ctx.send('I give that a ' + str(rating) + "/100!")
 
-    # @commands.command(help="Creates the database.")
-    # async def databasecreate(self, ctx):
-    #     db = create_engine('sqlite:///wordlists.db')
-    #
-    #     db.echo = False  # Try changing this to True and see what happens
-    #
-    #     metadata = BoundMetaData(db)
-    #
-    #     users = Table('users', metadata,
-    #                   Column('weapon_action', String, primary_key=True),
-    #                   Column('weapon_type', String(40)),
-    #                   Column('age', Integer),
-    #                   Column('password', String),
-    #                   )
-    #     users.create()
-    #
-    #     i = users.insert()
-    #     i.execute(name='Mary', age=30, password='secret')
-    #     i.execute({'name': 'John', 'age': 42},
-    #               {'name': 'Susan', 'age': 57},
-    #               {'name': 'Carl', 'age': 33})
-    #
-    #     s = users.select()
-    #     rs = s.execute()
 
     @commands.command()
     async def infinitetyping(self, ctx, channel : discord.TextChannel):
@@ -126,13 +98,8 @@ class Fun(commands.Cog):
             await ctx.send(f"Finished annoying people in {channel.name}.")
             print("Finished long typing.")
 
-    # @commands.command()
-    # async def randomquote(self, ctx):
-    #     this_dir = os.path.dirname(__file__)
-    #     this_dir.replace('/cogs', '')
-    #     quote = random.choice(open('quotes.txt').readlines())
-    #     await ctx.send(quote)
-
+    # Old game - not willing to delete it entirely, so in the comments it shall sit
+    '''
     @commands.command()
     async def fencewars(self, ctx, member : discord.Member):
         global pending_game
@@ -430,5 +397,6 @@ class FenceGamePlayer:
         return self.member_object
     def set_slaves(self, slaves):
         self.slaves = slaves
+    '''
 def setup(bot):
     bot.add_cog(Fun(bot))
