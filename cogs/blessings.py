@@ -29,19 +29,6 @@ class Blessings(commands.Cog):
         else:
             await ctx.send("You do not appear to have a blessing role, sorry.")
 
-    # Created solely to compile the roles once
-    '''
-    @commands.command()
-    async def blessrole(self, ctx):
-        await ctx.send("compiling blessing roles")
-        blessobject = {}
-        for role in ctx.guild.roles:
-            if "Blessings" in role.name:
-                blessobject[role.name] = role.id
-        with open('blessings.json', 'w') as blessings:
-            json.dump(blessobject, blessings)
-    '''
-
 
 def setup(self):
     self.add_cog(Blessings(self))
