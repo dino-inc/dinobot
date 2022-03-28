@@ -29,6 +29,10 @@ class Blessings(commands.Cog):
         else:
             await ctx.send("You do not appear to have a blessing role, sorry.")
 
+    @bless.error
+    async def bless_error(self, ctx, error):
+        await ctx.send(error)
+
 
 def setup(self):
     self.add_cog(Blessings(self))
