@@ -69,10 +69,10 @@ class Fun(commands.Cog):
     @commands.command(help = "Rating system.")
     async def rate(self, ctx):
         print(f"Rated {ctx.author.display_name}")
-        if ctx.message.content == "!rate dino":
+        if ctx.message.content == "-rate dino":
             await ctx.send('I give that a 101/100!!!')
             return
-        if ctx.message.content == "!rate spinny":
+        if ctx.message.content == "-rate spinny":
             await ctx.send('I give that a nice hug!')
             return
         rngseed = 0
