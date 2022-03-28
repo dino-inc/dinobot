@@ -15,7 +15,7 @@ class Blessings(commands.Cog):
         return ctx.guild.id == 309168904310095886
 
     @commands.check(check_if_samsara)
-    @commands.command()
+    @commands.command(help="Adds or removes your personal blessing role from a member.")
     async def bless(self, ctx, member: discord.Member):
         blessing_role = self.blessing_list.get(str(ctx.author.id))
         if blessing_role is not None:

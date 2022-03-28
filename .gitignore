@@ -5,3 +5,4 @@ virtualenv/
 .vscode/
 .idea
 auth.json
+instagram
