@@ -4,3 +4,4 @@ cogs/__pycache__/
 virtualenv/
 .vscode/
 .idea
+auth.json

@@ -8,18 +8,8 @@ class Emoji(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        global petpoc
-        if petpoc == True and self.bot.get_guild(rbnr) == message.guild:
-            # called after initial if to improve performance (still not sure if it does)
-            petchannel = discord.utils.get(message.guild.channels, name="shitposters_paradise")
-            if petchannel == message.channel:
-                await message.add_reaction("a:animatedpet:393801987247964161")
-        if message.author.id == tagged:
-            blobdance = "a:blobdance:429457433707151361"
-            await check_boi(message, blobdance, "boi")
-        else:
-            boi = "a:boi:452994849319419915"
-            await check_boi(message, boi, "boi")
+        boi = "a:boi:452994849319419915"
+        await check_boi(message, boi, "boi")
         heck = ":heck:830595955417284648"
         await check_boi(message, heck, "heck")
         await check_boi(message, heck, "hecking")
