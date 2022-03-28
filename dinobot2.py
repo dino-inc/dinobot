@@ -5,7 +5,7 @@ from discord.ext import commands
 
 # time to do this bot again, better this time
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='-')
 
 # Samsara ID
 azelserver = 309168904310095886
