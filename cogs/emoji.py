@@ -1,10 +1,14 @@
-import discord
+import json
 from discord.ext import commands
-import pickle
+import os
 
 class Emoji(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        verify_emoji_json_exists()
+        self.reaction_list = json.load(open('emojireactions.json'))
+        print(self.reaction_list)
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -53,6 +57,15 @@ async def check_boi(message, reaction, trigger):
 
 async def log_reaction_event(trigger):
     print(f"Added {trigger} reaction.")
+
+def verify_emoji_json_exists():
+    if os.path.exists('emojireactions.json'):
+        return
+    else:
+        with open('emojireactions.json', 'w') as json_file:
+            json.dump({}, json_file)
+        return
+
 
 def setup(bot):
     bot.add_cog(Emoji(bot))
