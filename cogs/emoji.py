@@ -24,10 +24,10 @@ class Emoji(commands.Cog):
                 if trigger in msg_word_array and message.guild.id == emoji_entry["server"] and message.author.id != 416391123360284683:
                     if emoji_entry["opt-in"]:
                         if message.author.id not in emoji_entry["users"]:
-                            return
+                            continue
                     else:
                         if message.author.id in emoji_entry["users"]:
-                            return
+                            continue
                     await message.add_reaction(emoji_entry["reaction"])
 
     @commands.command(help="Subscribe or unsubscribe to a reaction, based on trigger phrase.", aliases=["unsubscribe"])
@@ -79,7 +79,6 @@ class Emoji(commands.Cog):
                 output_string += f"<{emoji_entry['reaction']}>  {formatted_triggers}\n"
         await send_paginated(ctx, output_string)
 
-    # TODO global disable for all reactions
     @commands.command(help = "Input a trigger phrase, the emoji id, and 'opt-in' or 'opt-out'.",
                       aliases=["addreaction"])
     @commands.is_owner()
