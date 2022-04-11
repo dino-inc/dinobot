@@ -1,5 +1,4 @@
 import discord
-import sys, traceback
 import json
 from discord.ext import commands
 
