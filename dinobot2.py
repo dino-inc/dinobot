@@ -13,9 +13,7 @@ azelserver = 309168904310095886
 # I hate intents.
 intents = discord.Intents.all()
 
-# TODO: Switch from testing mode when rewrite finished
-# initial_extensions = ['cogs.fun', 'cogs.blessings', 'cogs.emoji', 'cogs.channelorder', 'cogs.insta']
-initial_extensions = ['cogs.emoji']
+initial_extensions = ['cogs.fun', 'cogs.blessings', 'cogs.emoji', 'cogs.channelorder', 'cogs.insta']
 
 if __name__ == '__main__':
     for extension in initial_extensions:

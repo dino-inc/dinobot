@@ -13,38 +13,6 @@ class Emoji(commands.Cog):
             self.json_emoji_db = {"emojis": []}
             print("Error loading emoji db, check emojireactions.json.")
 
-    # TODO: Rewrite emoji reactions
-    # TODO: Remove legacy code
-    '''
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        boi = "a:boi:452994849319419915"
-        await check_boi(message, boi, "boi")
-        heck = ":heck:830595955417284648"
-        await check_boi(message, heck, "heck")
-        await check_boi(message, heck, "hecking")
-        dab = "a:vault_dab:452284889262325762"
-        await check_boi(message, dab, "dab")
-        await check_boi(message, dab, "dabbing")
-        fortnite = "a:fortnitedance:478779951269675008"
-        await check_boi(message, fortnite, "fortnite")
-        augh = "a:augh:654202633174777876"
-        await check_boi(message, augh, "augh")
-        dudewtf = ":dudewtf:650772731742126120"
-        await check_boi(message, dudewtf, "smegma")
-        moe = ":moe:875565586023874601"
-        await check_boi(message, moe, "moe")
-        if message.guild.id == 309168904310095886:
-            oomfiebateman = ":oomfiebateman:957041584480849980"
-            await check_boi(message, oomfiebateman, "oomfie")
-            sus = ":sus:812872447127846952"
-            await check_boi(message, sus, "sus")
-            amogus = ":amogus:812872447090098197"
-            await check_boi(message, amogus, "amogus")
-            deathpose = ":deathpose:907418831335616552"
-            await check_boi(message, deathpose, "gryphon")
-            await check_boi(message, deathpose, "gryphonje")'''
-
     @commands.Cog.listener()
     async def on_message(self, message):
         cleaned_msg_content = re.sub('[^a-zA-Z0-9]+', ' ', message.content)
@@ -85,10 +53,16 @@ class Emoji(commands.Cog):
         for emoji_entry in self.json_emoji_db["emojis"]:
             if emoji_entry["server"] == ctx.guild.id:
                 output_string += f"{emoji_entry['trigger']} {emoji_entry['reaction']}, opt-in: {emoji_entry['opt-in']}, users: {emoji_entry['users']}\n"
-        # TODO pagination
-        await ctx.send(output_string)
+        response_chunk = 0
+        chunk_size = 1950
+        if (len(output_string) > 2000):
+            while (len(output_string) > response_chunk):
+                await ctx.send(output_string[response_chunk:response_chunk + chunk_size])
+                response_chunk += chunk_size
+        else:
+            await ctx.send(output_string)
 
-    @commands.command(help = "Input a trigger phrase, the emoji id, 'opt-in' or 'opt-out', and server if applicable.",
+    @commands.command(help = "Input a trigger phrase, the emoji id, and 'opt-in' or 'opt-out'.",
                       aliases=["addreaction"])
     @commands.is_owner()
     async def add_reaction(self, ctx, trigger_phrase, reaction_emoji_id, opt_status):
