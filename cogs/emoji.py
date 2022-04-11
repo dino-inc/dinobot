@@ -44,6 +44,7 @@ class Emoji(commands.Cog):
                         user_array.remove(ctx.author.id)
                         print(f"Removed {ctx.author.display_name} from emoji entry.")
                     update_reactions_db(self.json_emoji_db)
+                    await ctx.send("Adjusted your preferences.")
                     return
         await ctx.send("Could not find that phrase, maybe a typo?")
 
