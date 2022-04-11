@@ -64,7 +64,6 @@ class Emoji(commands.Cog):
     async def unsubscribed(self, ctx):
         output_string = "All unsubscribed reactions:\n"
         for emoji_entry in self.json_emoji_db["emojis"]:
-            print(is_subscribed(emoji_entry, ctx.author.id, ctx.guild.id))
             if not is_subscribed(emoji_entry, ctx.author.id, ctx.guild.id):
                 formatted_triggers = ", ".join(emoji_entry["trigger"])
                 output_string += f"<{emoji_entry['reaction']}>  {formatted_triggers}\n"
