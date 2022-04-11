@@ -1,6 +1,7 @@
 import json
 from discord.ext import commands
 import os
+import re
 
 class Emoji(commands.Cog):
     def __init__(self, bot):
@@ -44,7 +45,24 @@ class Emoji(commands.Cog):
             await check_boi(message, deathpose, "gryphon")
             await check_boi(message, deathpose, "gryphonje")'''
 
-    @commands.command(help = "Input a trigger phrase, the emoji id, and 'opt-in' or 'opt-out'.")
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        cleaned_msg_content = re.sub('[^a-zA-Z0-9]+', ' ', message.content)
+        msg_word_array = cleaned_msg_content.split()
+        for emoji_entry in self.json_emoji_db["emojis"]:
+            for trigger in emoji_entry["trigger"]:
+                if trigger in msg_word_array and message.guild.id == emoji_entry["server"]:
+                    if emoji_entry["opt-in"]:
+                        if message.author.id not in emoji_entry["users"]:
+                            return
+                    else:
+                        if message.author.id in emoji_entry["users"]:
+                            return
+                    await message.add_reaction(emoji_entry["reaction"])
+
+
+    @commands.command(help = "Input a trigger phrase, the emoji id, 'opt-in' or 'opt-out', and server if applicable.",
+                      alias="addreaction")
     @commands.is_owner()
     async def add_reaction(self, ctx, trigger_phrase, reaction_emoji_id, opt_status):
         # Handle inserting into empty dict
@@ -56,9 +74,9 @@ class Emoji(commands.Cog):
         for emoji in ctx.guild.emojis:
             if emoji.id == int(reaction_emoji_id):
                 if not emoji.animated:
-                    reaction_str = f"<:{emoji.name}:{reaction_emoji_id}>"
+                    reaction_str = f":{emoji.name}:{reaction_emoji_id}"
                 else:
-                    reaction_str = f"<a:{emoji.name}:{reaction_emoji_id}>"
+                    reaction_str = f"a:{emoji.name}:{reaction_emoji_id}"
         if reaction_str is None:
             await ctx.send("Emoji not found! Try again?")
             return
@@ -92,11 +110,15 @@ class Emoji(commands.Cog):
         self.json_emoji_db["emojis"].append({"trigger": [trigger_phrase],
                                              "reaction": reaction_str,
                                              "opt-in": opt_bool,
-                                             "users": []})
+                                             "users": [],
+                                             "server": ctx.guild.id
+                                             })
 
         # Write to file immediately
         with open("emojireactions.json", "w+") as output_file:
             json.dump(self.json_emoji_db, output_file)
+
+        await ctx.message.add_reaction(reaction_str)
 
 '''
 async def check_boi(message, reaction, trigger):
