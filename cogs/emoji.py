@@ -1,172 +1,139 @@
-import discord
+import json
 from discord.ext import commands
-import pickle
+import os
+import re
 
 class Emoji(commands.Cog):
     def __init__(self, bot):
-        global emoji_channel_id
-        global petpoc
-        global rbnr
-        global tagged
         self.bot = bot
-        petpoc = False
-        rbnr = 231614904035966984
-        emoji_channel_id = 327338669423722507
-        tagdump = open("tagged.pickle", "rb")
-        tagged = pickle.load(tagdump)
-        tagdump.close()
-
-    def check_if_rbnr(ctx):
-        return ctx.guild.id == rbnr
-
-    @commands.command(help="Summons the petpocalypse to rain down pets upon your foes.")
-    @commands.check(check_if_rbnr)
-    async def petpoc(self, ctx):
-        global petpoc
-        if self.bot.get_guild(rbnr) == ctx.guild and petpoc == False:
-            await ctx.send("**PETPOCALYPSE ARISEN**")
-            petpoc = True
-            print(f"{ctx.author.display_name} toggled the petpocalypse on")
-        elif self.bot.get_guild(rbnr) == ctx.guild and petpoc == True:
-            await ctx.send("*Petpocalypse powering down...*")
-            petpoc = False
-            print(f"{ctx.author.display_name} toggled the petpocalypse off")
-
-    @petpoc.error
-    async def petpoc_error(self, ctx, error):
-        if isinstance(error, commands.errors.CheckFailure):
-            await ctx.send("This is not RBNR.")
-            print(f"{ctx.author.display_name} tried to toggle the petpocalypse somewhere that wasn't rbnr")
-        else:
-            await ctx.send("Error. Could not start the petpocalypse. " + str(error))
-            print(f"{ctx.author.display_name} toggled the petpocalypse and it failed")
-
-    @commands.command(name='settagged')
-    @commands.is_owner()
-    async def settagged(self, ctx, member: discord.Member):
-        global tagged
-        tagged = member.id
-        tagged_file_dump = open("tagged.pickle", "wb")
-        pickle.dump(tagged, tagged_file_dump)
-        tagged_file_dump.close()
-        await ctx.send("Tagged "+member.display_name+" with the rainbow.")
-        print(f"Set tagged person to {member.display_name}")
-
-    @commands.command(name='checktagged')
-    async def checktagged(self, ctx):
+        verify_emoji_json_exists()
         try:
-            member = discord.utils.get(ctx.guild.members, id=tagged)
-            await ctx.send("The currently tagged user is " + member.display_name + ".")
-        except:
-            await ctx.send("Sorry, the currently tagged person seems to have vanished.")
-
-
-    @commands.command()
-    async def tag(self, ctx, member: discord.Member):
-        global tagged
-        if ctx.author.id == tagged:
-            tagged = member.id
-            pickle.dump(tagged, open("tagged.pickle", "wb"))
-            await ctx.send("Tagged "+member.display_name+" with the rainbow.")
-        else:
-            member = discord.utils.get(ctx.guild.members, id=tagged)
-            await ctx.send("You are not "+member.display_name+".")
-
-    @commands.command()
-    @commands.is_owner()
-    async def emoji_vote(self, ctx, url):
-        if ctx.channel.id == emoji_channel_id:
-            em = discord.Embed(description="An emoji vote has begun! Press ✅ to vote yes and "
-                                           f"❎ to vote no. \n You have 24 hours to vote.",
-                               colour=0xFF0000, timestamp=ctx.message.created_at)
-            # em.set_author(name=null,
-            #               icon_url=null,
-            #               url=null)
-            em.set_thumbnail(url=url)
-            vote_emoji_message = await ctx.send(embed=em)
-            await vote_emoji_message.add_reaction("✅")
-            await vote_emoji_message.add_reaction("❎")
+            self.json_emoji_db = json.load(open('emojireactions.json', "r"))
+        except json.JSONDecodeError:
+            self.json_emoji_db = {"emojis": []}
+            print("Error loading emoji db, check emojireactions.json.")
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        global petpoc
-        if petpoc == True and self.bot.get_guild(rbnr) == message.guild:
-            # called after initial if to improve performance (still not sure if it does)
-            petchannel = discord.utils.get(message.guild.channels, name="shitposters_paradise")
-            if petchannel == message.channel:
-                await message.add_reaction("a:animatedpet:393801987247964161")
-        if message.author.id == tagged:
-            blobdance = "a:blobdance:429457433707151361"
-            await check_boi(message, blobdance, "boi")
+        cleaned_msg_content = re.sub('[^a-zA-Z0-9]+', ' ', message.content)
+        msg_word_array = cleaned_msg_content.split()
+        for emoji_entry in self.json_emoji_db["emojis"]:
+            for trigger in emoji_entry["trigger"]:
+                if trigger in msg_word_array and message.guild.id == emoji_entry["server"] and message.author.id != 416391123360284683:
+                    if emoji_entry["opt-in"]:
+                        if message.author.id not in emoji_entry["users"]:
+                            return
+                    else:
+                        if message.author.id in emoji_entry["users"]:
+                            return
+                    await message.add_reaction(emoji_entry["reaction"])
+
+
+
+    @commands.command(help="Subscribe or unsubscribe to a reaction, based on trigger phrase.", aliases=["unsubscribe"])
+    async def subscribe(self, ctx, trigger_phrase):
+
+        for index, emoji_entry in enumerate(self.json_emoji_db["emojis"]):
+            for trigger in emoji_entry["trigger"]:
+                if trigger == trigger_phrase:
+                    user_array = self.json_emoji_db["emojis"][index]["users"]
+                    if ctx.author.id not in user_array:
+                        user_array.append(ctx.author.id)
+                        print(f"Added {ctx.author.display_name} to emoji entry.")
+                    else:
+                        user_array.remove(ctx.author.id)
+                        print(f"Removed {ctx.author.display_name} from emoji entry.")
+                    update_reactions_db(self.json_emoji_db)
+                    return
+        await ctx.send("Could not find that phrase, maybe a typo?")
+
+    @commands.command(help = "Lists all reactions for the server.")
+    async def list_reactions(self, ctx):
+        output_string = ""
+        for emoji_entry in self.json_emoji_db["emojis"]:
+            if emoji_entry["server"] == ctx.guild.id:
+                output_string += f"{emoji_entry['trigger']} {emoji_entry['reaction']}, opt-in: {emoji_entry['opt-in']}, users: {emoji_entry['users']}\n"
+        response_chunk = 0
+        chunk_size = 1950
+        if (len(output_string) > 2000):
+            while (len(output_string) > response_chunk):
+                await ctx.send(output_string[response_chunk:response_chunk + chunk_size])
+                response_chunk += chunk_size
         else:
-            boi = "a:boi:452994849319419915"
-            await check_boi(message, boi, "boi")
-        heck = ":heck:830595955417284648"
-        await check_boi(message, heck, "heck")
-        await check_boi(message, heck, "hecking")
-        dab = "a:vault_dab:452284889262325762"
-        await check_boi(message, dab, "dab")
-        await check_boi(message, dab, "dabbing")
-        fortnite = "a:fortnitedance:478779951269675008"
-        await check_boi(message, fortnite, "fortnite")
-        augh = "a:augh:654202633174777876"
-        await check_boi(message, augh, "augh")
-        dudewtf = ":dudewtf:650772731742126120"
-        await check_boi(message, dudewtf, "smegma")
-        moe = ":moe:875565586023874601"
-        await check_boi(message, moe, "moe")
-        if message.guild.id == 309168904310095886:
-            oomfiebateman = ":oomfiebateman:957041584480849980"
-            await check_boi(message, oomfiebateman, "oomfie")
-            sus = ":sus:812872447127846952"
-            await check_boi(message, sus, "sus")
-            amogus = ":amogus:812872447090098197"
-            await check_boi(message, amogus, "amogus")
-            deathpose = ":deathpose:907418831335616552"
-            await check_boi(message, deathpose, "gryphon")
-            await check_boi(message, deathpose, "gryphonje")
+            await ctx.send(output_string)
+
+    @commands.command(help = "Input a trigger phrase, the emoji id, and 'opt-in' or 'opt-out'.",
+                      aliases=["addreaction"])
+    @commands.is_owner()
+    async def add_reaction(self, ctx, trigger_phrase, reaction_emoji_id, opt_status):
+        # Handle inserting into empty dict
+        if self.json_emoji_db == {}:
+            self.json_emoji_db["emojis"] = []
+
+        # Retrieve emoji from server and format for dict
+        reaction_str = None
+        for server in self.bot.guilds:
+            for emoji in server.emojis:
+                if emoji.id == int(reaction_emoji_id):
+                    if not emoji.animated:
+                        reaction_str = f":{emoji.name}:{reaction_emoji_id}"
+                    else:
+                        reaction_str = f"a:{emoji.name}:{reaction_emoji_id}"
+        if reaction_str is None:
+            await ctx.send("Emoji not found! Maybe the emoji is hosted in a different server?")
+            return
+
+        # Check reaction emoji and add trigger phrase to existing entry if possible
+        for index, emoji_entry in enumerate(self.json_emoji_db["emojis"]):
+            if emoji_entry["reaction"] == reaction_str:
+                # Ignore trigger if it's already in dict
+                for phrase in emoji_entry["trigger"]:
+                    if trigger_phrase == phrase:
+                        await ctx.send("Trigger phrase already present for this reaction.")
+                        return
+                self.json_emoji_db["emojis"][index]["trigger"].append(trigger_phrase)
+
+                # Write updated dict to file
+                update_reactions_db(self.json_emoji_db)
+                return
+
+        # Convert opt-in to bool
+        opt_bool = None
+        if opt_status == "opt-in":
+            opt_bool = True
+        elif opt_status == "opt-out":
+            opt_bool = False
+        if opt_bool is None:
+            await ctx.send("Malformed opt status! Please use *exactly* opt-in or opt-out.")
+            return
 
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
-        try:
-            messageid = payload.message_id
-            channelid = payload.channel_id
-            reactchannel = self.bot.get_channel(channelid)
-            message = await reactchannel.get_message(messageid)
-            if payload.emoji.id == 349032980821311488:
-                await message.add_reaction("a:animatedpet:393801987247964161")
-                print("Added animated pet.")
-            elif payload.emoji.id == 251069497241370624:
-                await message.add_reaction("a:owowhatsthis:422870186622844937")
-                print("Added animated OwO.")
-        except: pass
+        # Generate a new dict entry
+        self.json_emoji_db["emojis"].append({"trigger": [trigger_phrase],
+                                             "reaction": reaction_str,
+                                             "opt-in": opt_bool,
+                                             "users": [],
+                                             "server": ctx.guild.id
+                                             })
 
-    # quick and dirty emoji id finder
-    # async def on_ready(self):
-    #     for emoji in self.bot.emojis:
-    #         if emoji.name == "fortnitedance":
-    #             print(emoji.id)
-    #             print(emoji.name)
+        # Write to file immediately
+        update_reactions_db(self.json_emoji_db)
+
+        await ctx.message.add_reaction(reaction_str)
 
 
-async def check_boi(message, reaction, trigger):
-    if trigger in message.content.lower():
-        if " "+trigger+" " in message.content.lower():
-            await message.add_reaction(reaction)
-            await log_reaction_event(trigger)
-        elif message.content.lower().startswith(trigger+" ") or message.content.startswith(trigger.upper()+" "):
-            await message.add_reaction(reaction)
-            await log_reaction_event(trigger)
-        elif message.content.lower().endswith(" "+trigger) or message.content.endswith(" "+trigger.upper()):
-            await message.add_reaction(reaction)
-            await log_reaction_event(trigger)
-        elif len(message.content) == len(trigger):
-            await message.add_reaction(reaction)
-            await log_reaction_event(trigger)
+def verify_emoji_json_exists():
+    if os.path.exists('emojireactions.json'):
+        return
+    else:
+        with open('emojireactions.json', 'w') as json_file:
+            json.dump({"emojis": []}, json_file)
+        return
 
-async def log_reaction_event(trigger):
-    print(f"Added {trigger} reaction.")
+def update_reactions_db(dict):
+    with open("emojireactions.json", "w+") as output_file:
+        json.dump(dict, output_file)
+
 
 def setup(bot):
     bot.add_cog(Emoji(bot))

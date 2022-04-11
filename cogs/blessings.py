@@ -1,5 +1,4 @@
 import discord
-import sys, traceback
 import json
 from discord.ext import commands
 
@@ -15,7 +14,7 @@ class Blessings(commands.Cog):
         return ctx.guild.id == 309168904310095886
 
     @commands.check(check_if_samsara)
-    @commands.command()
+    @commands.command(help="Adds or removes your personal blessing role from a member.")
     async def bless(self, ctx, member: discord.Member):
         blessing_role = self.blessing_list.get(str(ctx.author.id))
         if blessing_role is not None:
@@ -29,18 +28,9 @@ class Blessings(commands.Cog):
         else:
             await ctx.send("You do not appear to have a blessing role, sorry.")
 
-    # Created solely to compile the roles once
-    '''
-    @commands.command()
-    async def blessrole(self, ctx):
-        await ctx.send("compiling blessing roles")
-        blessobject = {}
-        for role in ctx.guild.roles:
-            if "Blessings" in role.name:
-                blessobject[role.name] = role.id
-        with open('blessings.json', 'w') as blessings:
-            json.dump(blessobject, blessings)
-    '''
+    @bless.error
+    async def bless_error(self, ctx, error):
+        await ctx.send(error)
 
 
 def setup(self):
