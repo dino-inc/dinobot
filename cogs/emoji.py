@@ -51,7 +51,7 @@ class Emoji(commands.Cog):
         msg_word_array = cleaned_msg_content.split()
         for emoji_entry in self.json_emoji_db["emojis"]:
             for trigger in emoji_entry["trigger"]:
-                if trigger in msg_word_array and message.guild.id == emoji_entry["server"]:
+                if trigger in msg_word_array and message.guild.id == emoji_entry["server"] and message.author.id != 416391123360284683:
                     if emoji_entry["opt-in"]:
                         if message.author.id not in emoji_entry["users"]:
                             return
@@ -78,6 +78,15 @@ class Emoji(commands.Cog):
                     update_reactions_db(self.json_emoji_db)
                     return
         await ctx.send("Could not find that phrase, maybe a typo?")
+
+    @commands.command(help = "Lists all reactions for the server.")
+    async def list_reactions(self, ctx):
+        output_string = ""
+        for emoji_entry in self.json_emoji_db["emojis"]:
+            if emoji_entry["server"] == ctx.guild.id:
+                output_string += f"{emoji_entry['trigger']} {emoji_entry['reaction']}, opt-in: {emoji_entry['opt-in']}, users: {emoji_entry['users']}\n"
+        # TODO pagination
+        await ctx.send(output_string)
 
     @commands.command(help = "Input a trigger phrase, the emoji id, 'opt-in' or 'opt-out', and server if applicable.",
                       aliases=["addreaction"])
