@@ -6,3 +6,4 @@ virtualenv/
 .idea
 auth.json
 instagram
+emojireactions.json
