@@ -60,9 +60,25 @@ class Emoji(commands.Cog):
                             return
                     await message.add_reaction(emoji_entry["reaction"])
 
+    @commands.command(help="Subscribe or unsubscribe to a reaction, based on trigger phrase.", aliases=["unsubscribe"])
+    async def subscribe(self, ctx, trigger_phrase):
+
+        for index, emoji_entry in enumerate(self.json_emoji_db["emojis"]):
+            for trigger in emoji_entry["trigger"]:
+                if trigger == trigger_phrase:
+                    user_array = self.json_emoji_db["emojis"][index]["users"]
+                    if ctx.author.id not in user_array:
+                        user_array.append(ctx.author.id)
+                        print("Added user to emoji entry.")
+                    else:
+                        user_array.remove(ctx.author.id)
+                        print("Removed user from emoji entry.")
+                    update_reactions_db(self.json_emoji_db)
+                    return
+        await ctx.send("Could not find that phrase, maybe a typo?")
 
     @commands.command(help = "Input a trigger phrase, the emoji id, 'opt-in' or 'opt-out', and server if applicable.",
-                      alias="addreaction")
+                      aliases=["addreaction"])
     @commands.is_owner()
     async def add_reaction(self, ctx, trigger_phrase, reaction_emoji_id, opt_status):
         # Handle inserting into empty dict
@@ -92,8 +108,7 @@ class Emoji(commands.Cog):
                 self.json_emoji_db["emojis"][index]["trigger"].append(trigger_phrase)
 
                 # Write updated dict to file
-                with open("emojireactions.json", "w+") as output_file:
-                    json.dump(self.json_emoji_db, output_file)
+                update_reactions_db(self.json_emoji_db)
                 return
 
         # Convert opt-in to bool
@@ -115,8 +130,7 @@ class Emoji(commands.Cog):
                                              })
 
         # Write to file immediately
-        with open("emojireactions.json", "w+") as output_file:
-            json.dump(self.json_emoji_db, output_file)
+        update_reactions_db(self.json_emoji_db)
 
         await ctx.message.add_reaction(reaction_str)
 
@@ -147,6 +161,10 @@ def verify_emoji_json_exists():
         with open('emojireactions.json', 'w') as json_file:
             json.dump({"emojis": []}, json_file)
         return
+
+def update_reactions_db(dict):
+    with open("emojireactions.json", "w+") as output_file:
+        json.dump(dict, output_file)
 
 
 def setup(bot):
