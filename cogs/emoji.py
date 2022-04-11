@@ -60,6 +60,8 @@ class Emoji(commands.Cog):
                             return
                     await message.add_reaction(emoji_entry["reaction"])
 
+
+
     @commands.command(help="Subscribe or unsubscribe to a reaction, based on trigger phrase.", aliases=["unsubscribe"])
     async def subscribe(self, ctx, trigger_phrase):
 
@@ -69,10 +71,10 @@ class Emoji(commands.Cog):
                     user_array = self.json_emoji_db["emojis"][index]["users"]
                     if ctx.author.id not in user_array:
                         user_array.append(ctx.author.id)
-                        print("Added user to emoji entry.")
+                        print(f"Added {ctx.author.display_name} to emoji entry.")
                     else:
                         user_array.remove(ctx.author.id)
-                        print("Removed user from emoji entry.")
+                        print(f"Removed {ctx.author.display_name} from emoji entry.")
                     update_reactions_db(self.json_emoji_db)
                     return
         await ctx.send("Could not find that phrase, maybe a typo?")
@@ -87,14 +89,15 @@ class Emoji(commands.Cog):
 
         # Retrieve emoji from server and format for dict
         reaction_str = None
-        for emoji in ctx.guild.emojis:
-            if emoji.id == int(reaction_emoji_id):
-                if not emoji.animated:
-                    reaction_str = f":{emoji.name}:{reaction_emoji_id}"
-                else:
-                    reaction_str = f"a:{emoji.name}:{reaction_emoji_id}"
+        for server in self.bot.guilds:
+            for emoji in server.emojis:
+                if emoji.id == int(reaction_emoji_id):
+                    if not emoji.animated:
+                        reaction_str = f":{emoji.name}:{reaction_emoji_id}"
+                    else:
+                        reaction_str = f"a:{emoji.name}:{reaction_emoji_id}"
         if reaction_str is None:
-            await ctx.send("Emoji not found! Try again?")
+            await ctx.send("Emoji not found! Maybe the emoji is hosted in a different server?")
             return
 
         # Check reaction emoji and add trigger phrase to existing entry if possible
@@ -121,6 +124,7 @@ class Emoji(commands.Cog):
             await ctx.send("Malformed opt status! Please use *exactly* opt-in or opt-out.")
             return
 
+
         # Generate a new dict entry
         self.json_emoji_db["emojis"].append({"trigger": [trigger_phrase],
                                              "reaction": reaction_str,
@@ -134,25 +138,6 @@ class Emoji(commands.Cog):
 
         await ctx.message.add_reaction(reaction_str)
 
-'''
-async def check_boi(message, reaction, trigger):
-    if trigger in message.content.lower():
-        if " "+trigger+" " in message.content.lower():
-            await message.add_reaction(reaction)
-            await log_reaction_event(trigger)
-        elif message.content.lower().startswith(trigger+" ") or message.content.startswith(trigger.upper()+" "):
-            await message.add_reaction(reaction)
-            await log_reaction_event(trigger)
-        elif message.content.lower().endswith(" "+trigger) or message.content.endswith(" "+trigger.upper()):
-            await message.add_reaction(reaction)
-            await log_reaction_event(trigger)
-        elif len(message.content) == len(trigger):
-            await message.add_reaction(reaction)
-            await log_reaction_event(trigger)
-
-async def log_reaction_event(trigger):
-    print(f"Added {trigger} reaction.")
-    '''
 
 def verify_emoji_json_exists():
     if os.path.exists('emojireactions.json'):
