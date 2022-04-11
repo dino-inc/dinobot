@@ -16,7 +16,9 @@ class Emoji(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         cleaned_msg_content = re.sub('[^a-zA-Z0-9]+', ' ', message.content)
-        msg_word_array = cleaned_msg_content.split()
+        msg_word_array = []
+        for word in cleaned_msg_content.split():
+            msg_word_array.append(word.lower())
         for emoji_entry in self.json_emoji_db["emojis"]:
             for trigger in emoji_entry["trigger"]:
                 if trigger in msg_word_array and message.guild.id == emoji_entry["server"] and message.author.id != 416391123360284683:
@@ -27,8 +29,6 @@ class Emoji(commands.Cog):
                         if message.author.id in emoji_entry["users"]:
                             return
                     await message.add_reaction(emoji_entry["reaction"])
-
-
 
     @commands.command(help="Subscribe or unsubscribe to a reaction, based on trigger phrase.", aliases=["unsubscribe"])
     async def subscribe(self, ctx, trigger_phrase):
@@ -48,21 +48,38 @@ class Emoji(commands.Cog):
                     return
         await ctx.send("Could not find that phrase, maybe a typo?")
 
-    @commands.command(help = "Lists all reactions for the server.")
-    async def list_reactions(self, ctx):
+    @commands.group(help = "Lists all reactions for the server.")
+    async def list(self, ctx):
+        pass
+
+    @list.command(help="The debug version of the list.")
+    async def debug(self, ctx):
         output_string = ""
         for emoji_entry in self.json_emoji_db["emojis"]:
             if emoji_entry["server"] == ctx.guild.id:
                 output_string += f"{emoji_entry['trigger']} {emoji_entry['reaction']}, opt-in: {emoji_entry['opt-in']}, users: {emoji_entry['users']}\n"
-        response_chunk = 0
-        chunk_size = 1950
-        if (len(output_string) > 2000):
-            while (len(output_string) > response_chunk):
-                await ctx.send(output_string[response_chunk:response_chunk + chunk_size])
-                response_chunk += chunk_size
-        else:
-            await ctx.send(output_string)
+        await send_paginated(ctx, output_string)
 
+    @list.command(help="Show all unsubscribed reactions.")
+    async def unsubscribed(self, ctx):
+        output_string = "All unsubscribed reactions:\n"
+        for emoji_entry in self.json_emoji_db["emojis"]:
+            print(is_subscribed(emoji_entry, ctx.author.id, ctx.guild.id))
+            if not is_subscribed(emoji_entry, ctx.author.id, ctx.guild.id):
+                formatted_triggers = ", ".join(emoji_entry["trigger"])
+                output_string += f"<{emoji_entry['reaction']}>  {formatted_triggers}\n"
+        await send_paginated(ctx, output_string)
+
+    @list.command(help="Show all subscribed reactions.")
+    async def subscribed(self, ctx):
+        output_string = "All subscribed reactions:\n"
+        for emoji_entry in self.json_emoji_db["emojis"]:
+            if is_subscribed(emoji_entry, ctx.author.id, ctx.guild.id):
+                formatted_triggers = ", ".join(emoji_entry["trigger"])
+                output_string += f"<{emoji_entry['reaction']}>  {formatted_triggers}\n"
+        await send_paginated(ctx, output_string)
+
+    # TODO global disable for all reactions
     @commands.command(help = "Input a trigger phrase, the emoji id, and 'opt-in' or 'opt-out'.",
                       aliases=["addreaction"])
     @commands.is_owner()
@@ -131,9 +148,32 @@ def verify_emoji_json_exists():
             json.dump({"emojis": []}, json_file)
         return
 
-def update_reactions_db(dict):
+
+def update_reactions_db(db):
     with open("emojireactions.json", "w+") as output_file:
-        json.dump(dict, output_file)
+        json.dump(db, output_file)
+
+
+def is_subscribed(emoji, user_id, guild_id):
+    if emoji["server"] != guild_id:
+        return False
+    if emoji["opt-in"] is True and user_id in emoji["users"]:
+        return True
+    elif emoji["opt-in"] is False and user_id not in emoji["users"]:
+        return True
+    else:
+        return False
+
+
+async def send_paginated(ctx, text):
+    response_chunk = 0
+    chunk_size = 1999
+    if len(text) > 2000:
+        while len(text) > response_chunk:
+            await ctx.send(text[response_chunk:response_chunk + chunk_size])
+            response_chunk += chunk_size
+    else:
+        await ctx.send(text)
 
 
 def setup(bot):
