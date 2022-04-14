@@ -23,27 +23,24 @@ class Insta(commands.Cog):
         self.insta = instaloader.Instaloader(download_video_thumbnails=False)
         insta_creds = json.load(open("./auth.json"))
         self.insta.login(insta_creds["username"], insta_creds["password"])
+        self.queue = []
     @commands.Cog.listener()
     async def on_message(self, message):
-        if(message.author.id == 416391123360284683):
+        if(message.author.id == self.bot.id):
             return
         shortcode = re.search('(https://.*)/(.*)/', message.content)
         link = re.search('(https://.*/.*/.*)', message.content)
         if shortcode is None:
             return
+        website_name = shortcode.group(1)
 
-        directory = os.fsencode("./instagram/")
-        # Empty the image directory of old images
-        for filename in os.listdir(directory):
-            filepath = os.path.join(directory, filename)
-            os.remove(filepath)
-        if "instagram" not in shortcode.group(1) \
-                and "deviantart" not in shortcode.group(1) \
-                and "twitter" not in shortcode.group(1)\
-                and "artfight" not in shortcode.group(1):
+        # Check that any supported website is present in the url
+        platforms = ('instagram', 'deviantart', 'twitter', 'artfight')
+        if any(platform_name in website_name for platform_name in platforms):
             return
+
         # Create and download the post
-        if "instagram" in shortcode.group(1):
+        if "instagram" in website_name:
             await instagram_rip(self, shortcode, message)
         elif "deviantart" in shortcode.group(1):
             await deviantart_rip(self, message, link)
