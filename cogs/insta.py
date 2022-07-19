@@ -179,7 +179,7 @@ async def is_spoiler(message):
     spoiler = re.findall('(\|\|([^|]*)\|\|)', message.content)
     link = re.search('((https://.*)(/.*/)([\w-]*)+)', message.content)
     for match in spoiler:
-        if spoiler is not None and link is not None and match[1] == link.group(1):
+        if spoiler is not None and link is not None and match[1].strip() == link.group(1):
             spoil = True
     if spoil:
         return True
