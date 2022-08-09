@@ -16,12 +16,17 @@ class Emoji(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         cleaned_msg_content = re.sub('[^a-zA-Z0-9]+', ' ', message.content)
-        msg_word_array = []
-        for word in cleaned_msg_content.split():
-            msg_word_array.append(word.lower())
         for emoji_entry in self.json_emoji_db["emojis"]:
             for trigger in emoji_entry["trigger"]:
-                if trigger in msg_word_array and message.guild.id == emoji_entry["server"] and message.author.id != 416391123360284683:
+                match = None
+                if trigger in cleaned_msg_content:
+                    if message.content == trigger or \
+                       message.content.endswith(" "+trigger) or\
+                       message.content.startswith(trigger+" "):
+                        match = True
+                    else:
+                        match = re.search(f"(.*\s({trigger})\s.*)", cleaned_msg_content)
+                if match and message.guild.id == emoji_entry["server"] and message.author.id != 416391123360284683:
                     if emoji_entry["opt-in"]:
                         if message.author.id not in emoji_entry["users"]:
                             continue
