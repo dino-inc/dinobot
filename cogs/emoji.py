@@ -15,7 +15,7 @@ class Emoji(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        cleaned_msg_content = re.sub('[^a-zA-Z0-9]+', ' ', message.content)
+        cleaned_msg_content = re.sub('[^a-zA-Z0-9]+', ' ', message.content).lower()
         for emoji_entry in self.json_emoji_db["emojis"]:
             for trigger in emoji_entry["trigger"]:
                 match = None
