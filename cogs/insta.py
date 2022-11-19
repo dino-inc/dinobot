@@ -12,6 +12,7 @@ from lxml import html
 import io
 import magic
 import time
+import selenium
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import asyncio
@@ -40,7 +41,8 @@ class Insta(commands.Cog):
         if "instagram" not in shortcode.group(1) \
                 and "deviantart" not in shortcode.group(1) \
                 and "twitter" not in shortcode.group(1)\
-                and "artfight" not in shortcode.group(1):
+                and "artfight" not in shortcode.group(1)\
+                and "tumblr" not in shortcode.group(1):
             return
         # Create and download the post
         if "instagram" in shortcode.group(1):
@@ -53,6 +55,9 @@ class Insta(commands.Cog):
         elif "artfight" in shortcode.group(1):
             await artfight_rip(self, message)
             return
+        elif "tumblr" in shortcode.group(1):
+            await tumblr_rip(self, message)
+        return
         filepath = None
         try:
             # Delete all downloaded files that aren't the image
@@ -143,6 +148,36 @@ async def artfight_rip(self, message):
     browser.quit()
     return True
 
+async def tumblr_rip(self, message):
+    options = Options()
+    options.headless = True
+    options.add_argument('--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) '
+                         'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile '
+                         'Safari/537.36 Edge/12.10166"')
+    browser = webdriver.Chrome(options=options)
+    try:
+        browser.get(message.content)
+    except selenium.common.exceptions.WebDriverException:
+        #try it twice for luck
+        print("Trying to access webpage again.")
+        browser.get(message.content)
+    # Select single images
+    try:
+        srcset = browser.find_element_by_css_selector('img[alt="Image"]').get_attribute("srcset")
+        imageurl = srcset.split(", ")[-1]
+        imageurl = imageurl.split(" ")[0]
+        # Go to the last element of the srcset (highest quality?)
+        browser.get(imageurl)
+        await direct_download(imageurl, "tumblrimg", message, "tumblr")
+    # Selecting album images
+    except:
+        post = browser.find_element_by_css_selector('.post:first-of-type')
+        album = post.find_elements_by_css_selector('img[alt="image"]')
+        for albumimage in album:
+            await direct_download(albumimage.get_attribute("src"), "tumblrimg", message, "tumblr")
+    browser.quit()
+    return True
+
 async def direct_download(image, title, message, site):
     image_request = None
     if site == "deviantart":
@@ -154,7 +189,7 @@ async def direct_download(image, title, message, site):
             return
         # Get raw image data from link
         image_request = requests.get(image[0], stream=True).raw.data
-    elif site == "artfight":
+    else:
         image_request = requests.get(image, stream=True).raw.data
     # Find file extension
     filetype = magic.Magic(mime=True).from_buffer(image_request)
