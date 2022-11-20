@@ -14,6 +14,7 @@ import magic
 import time
 import selenium
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import asyncio
 
@@ -23,7 +24,7 @@ class Insta(commands.Cog):
         self.bot = bot
         self.insta = instaloader.Instaloader(download_video_thumbnails=False)
         insta_creds = json.load(open("./auth.json"))
-        self.insta.login(insta_creds["username"], insta_creds["password"])
+        #self.insta.login(insta_creds["username"], insta_creds["password"])
     @commands.Cog.listener()
     async def on_message(self, message):
         if(message.author.id == 416391123360284683):
@@ -168,24 +169,55 @@ async def tumblr_rip(self, message):
         #try it twice for luck
         print("Trying to access webpage again.")
         browser.get(message.content)
-    # Select single images
-    try:
-        srcset = browser.find_element_by_css_selector('img[alt="Image"]').get_attribute("srcset")
-        imageurl = srcset.split(", ")[-1]
-        imageurl = imageurl.split(" ")[0]
-        # Go to the last element of the srcset (highest quality?)
-        browser.get(imageurl)
-        await direct_download(imageurl, "tumblrimg", message, "tumblr")
-    # Selecting album images
-    except:
-        post = browser.find_element_by_css_selector('.post:first-of-type')
-        album = post.find_elements_by_css_selector('img[alt="image"]')
-        for albumimage in album:
-            await direct_download(albumimage.get_attribute("src"), "tumblrimg", message, "tumblr")
-    browser.stop_client()
-    browser.close()
-    browser.quit()
-    return True
+
+    # Determine URL type
+    urlcat = re.search('(https://.*/.*/.*)', message.content)
+
+    #direct posts
+    if("/post/" in browser.current_url):
+        print("Downloading direct post")
+        post = browser.find_element(By.CSS_SELECTOR, '.post:first-of-type')
+        images = post.find_elements(By.CSS_SELECTOR, '.u-photo')
+        if (len(images) == 0):
+            # The album case
+            images = post.find_elements(By.CSS_SELECTOR, '.image')
+        if (len(images) == 0):
+            # The iframe case
+            iframe = browser.find_element(By.XPATH, "//iframe[@class='photoset']")
+            browser.switch_to.frame(iframe)
+            images = browser.find_elements(By.CSS_SELECTOR, '.photoset_photo img')
+        for image in images:
+            await direct_download(image.get_attribute("src"), "tumblrimg", message, "tumblr")
+    #timeline post
+    else:
+        print("downloading timeline post")
+        post = browser.find_element(By.CSS_SELECTOR, '.FtjPK:first-of-type')
+        images = post.find_elements(By.CSS_SELECTOR, '.xhGbM')
+        for image in images:
+            srcset = image.get_attribute("srcset")
+            imageurl = srcset.split(", ")[-1]
+            imageurl = imageurl.split(" ")[0]
+            await direct_download(imageurl, "tumblrimg", message, "tumblr")
+
+
+    # # Select single images
+    # try:
+    #     srcset = browser.find_element(By.CSS_SELECTOR, 'img[alt="Image"]').get_attribute("srcset")
+    #     imageurl = srcset.split(", ")[-1]
+    #     imageurl = imageurl.split(" ")[0]
+    #     # Go to the last element of the srcset (highest quality?)
+    #     browser.get(imageurl)
+    #     await direct_download(imageurl, "tumblrimg", message, "tumblr")
+    # # Selecting album images
+    # except:
+    #     post = browser.find_element_by_css_selector('.post:first-of-type')
+    #     album = post.find_elements_by_css_selector('img[alt="image"]')
+    #     for albumimage in album:
+    #         await direct_download(albumimage.get_attribute("src"), "tumblrimg", message, "tumblr")
+    # browser.stop_client()
+    # browser.close()
+    # browser.quit()
+    # return True
 
 async def direct_download(image, title, message, site):
     image_request = None
