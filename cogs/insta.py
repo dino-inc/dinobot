@@ -24,7 +24,7 @@ class Insta(commands.Cog):
         self.bot = bot
         self.insta = instaloader.Instaloader(download_video_thumbnails=False)
         insta_creds = json.load(open("./auth.json"))
-        #self.insta.login(insta_creds["username"], insta_creds["password"])
+        self.insta.login(insta_creds["username"], insta_creds["password"])
     @commands.Cog.listener()
     async def on_message(self, message):
         if(message.author.id == 416391123360284683):
@@ -170,9 +170,6 @@ async def tumblr_rip(self, message):
         print("Trying to access webpage again.")
         browser.get(message.content)
 
-    # Determine URL type
-    urlcat = re.search('(https://.*/.*/.*)', message.content)
-
     #direct posts
     if("/post/" in browser.current_url):
         print("Downloading direct post")
@@ -198,26 +195,6 @@ async def tumblr_rip(self, message):
             imageurl = srcset.split(", ")[-1]
             imageurl = imageurl.split(" ")[0]
             await direct_download(imageurl, "tumblrimg", message, "tumblr")
-
-
-    # # Select single images
-    # try:
-    #     srcset = browser.find_element(By.CSS_SELECTOR, 'img[alt="Image"]').get_attribute("srcset")
-    #     imageurl = srcset.split(", ")[-1]
-    #     imageurl = imageurl.split(" ")[0]
-    #     # Go to the last element of the srcset (highest quality?)
-    #     browser.get(imageurl)
-    #     await direct_download(imageurl, "tumblrimg", message, "tumblr")
-    # # Selecting album images
-    # except:
-    #     post = browser.find_element_by_css_selector('.post:first-of-type')
-    #     album = post.find_elements_by_css_selector('img[alt="image"]')
-    #     for albumimage in album:
-    #         await direct_download(albumimage.get_attribute("src"), "tumblrimg", message, "tumblr")
-    # browser.stop_client()
-    # browser.close()
-    # browser.quit()
-    # return True
 
 async def direct_download(image, title, message, site):
     image_request = None
