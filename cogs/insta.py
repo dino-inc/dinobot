@@ -150,11 +150,18 @@ async def artfight_rip(self, message):
 
 async def tumblr_rip(self, message):
     options = Options()
+    options.add_argument("enable-automation");
+    options.add_argument("--headless");
+    options.add_argument("--window-size=1920,1080");
+    options.add_argument("--no-sandbox");
+    options.add_argument("--disable-extensions");
+    options.add_argument("--dns-prefetch-disable");
+    options.add_argument("--disable-gpu");
     options.headless = True
     options.add_argument('--user-agent="Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) '
                          'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile '
                          'Safari/537.36 Edge/12.10166"')
-    browser = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options)
+    browser = webdriver.Chrome(options=options)
     try:
         browser.get(message.content)
     except selenium.common.exceptions.WebDriverException:
@@ -175,6 +182,8 @@ async def tumblr_rip(self, message):
         album = post.find_elements_by_css_selector('img[alt="image"]')
         for albumimage in album:
             await direct_download(albumimage.get_attribute("src"), "tumblrimg", message, "tumblr")
+    browser.stop_client()
+    browser.close()
     browser.quit()
     return True
 
