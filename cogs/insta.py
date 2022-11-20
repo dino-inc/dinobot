@@ -195,6 +195,8 @@ async def tumblr_rip(self, message):
             imageurl = srcset.split(", ")[-1]
             imageurl = imageurl.split(" ")[0]
             await direct_download(imageurl, "tumblrimg", message, "tumblr")
+    browser.quit()
+    return True
 
 async def direct_download(image, title, message, site):
     image_request = None
