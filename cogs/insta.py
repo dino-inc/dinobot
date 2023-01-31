@@ -33,6 +33,8 @@ class Insta(commands.Cog):
         link = re.search('(https://.*/.*/.*)', message.content)
         if shortcode is None:
             return
+        if "ddinstagram" in shortcode.group(1):
+            return
 
         directory = os.fsencode("./instagram/")
         # Empty the image directory of old images
