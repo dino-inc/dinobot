@@ -5,7 +5,7 @@ from discord.ext import commands
 
 # time to do this bot again, better this time
 
-bot = commands.Bot(command_prefix='-')
+bot = commands.Bot(command_prefix='-', intents=discord.Intents.all())
 
 # Samsara ID
 azelserver = 309168904310095886
@@ -45,5 +45,5 @@ async def on_message(message):
 # dino_bot
 token = open("token.txt", 'r')
 token = token.read().strip()
-bot.run(token, bot=True, reconnect=True)
+bot.run(token, reconnect=True)
 

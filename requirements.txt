@@ -1,0 +1,6 @@
+python-magic
+discord.py 
+instaloader
+youtube_dl
+lxml
+selenium
