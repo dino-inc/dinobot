@@ -24,9 +24,10 @@ class Insta(commands.Cog):
         self.bot = bot
         self.insta = instaloader.Instaloader(download_video_thumbnails=False)
         insta_creds = json.load(open("./auth.json"))
-        #self.insta.login(insta_creds["username"], insta_creds["password"])
+        # self.insta.login(insta_creds["username"], insta_creds["password"])
     @commands.Cog.listener()
     async def on_message(self, message):
+        print("listening")
         if(message.author.id == 416391123360284683):
             return
         shortcode = re.search('(https://.*)/(.*)/', message.content)
@@ -59,7 +60,8 @@ class Insta(commands.Cog):
             await artfight_rip(self, message)
             return
         elif "tumblr" in shortcode.group(1):
-            await tumblr_rip(self, message)
+            # discord finally reliably embeds
+            # await tumblr_rip(self, message)
             return
         filepath = None
         try:
@@ -134,6 +136,7 @@ async def twitter_rip(self, message):
         return False
 
 async def artfight_rip(self, message):
+    print(f"Ripping artfight from {message}")
     artfight_creds = json.load(open("./auth.json"))
     options = Options()
     options.headless = True
