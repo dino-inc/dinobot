@@ -24,7 +24,7 @@ class Insta(commands.Cog):
         self.bot = bot
         self.insta = instaloader.Instaloader(download_video_thumbnails=False)
         insta_creds = json.load(open("./auth.json"))
-        # self.insta.login(insta_creds["username"], insta_creds["password"])
+        self.insta.login(insta_creds["username"], insta_creds["password"])
     @commands.Cog.listener()
     async def on_message(self, message):
         print("listening")
